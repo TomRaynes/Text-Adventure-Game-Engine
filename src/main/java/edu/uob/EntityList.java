@@ -51,7 +51,6 @@ public class EntityList {
     }
 
     private String entitySetToString(Set<GameEntity> entities) {
-        //if (entities.isEmpty()) return "";
 
         StringBuilder str = new StringBuilder();
 

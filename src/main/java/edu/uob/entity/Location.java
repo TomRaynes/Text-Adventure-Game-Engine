@@ -2,6 +2,7 @@ package edu.uob.entity;
 
 import com.alexmerz.graphviz.objects.Graph;
 import com.alexmerz.graphviz.objects.Node;
+import edu.uob.Player;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,7 +12,6 @@ import java.util.function.Function;
 public class Location extends GameEntity {
 
     private Map<String, Character> characters;
-    private Map<String, Player> players;
     private Map<String, Artefact> artefacts;
     private Map<String, Furniture> furniture;
     private Map<String, Location> paths;
@@ -21,7 +21,6 @@ public class Location extends GameEntity {
               graph.getNodes(false).get(0).getAttribute("description"));
 
         characters = new HashMap<>();
-        players = new HashMap<>();
         artefacts = new HashMap<>();
         furniture = new HashMap<>();
         paths = new HashMap<>();
@@ -128,8 +127,6 @@ public class Location extends GameEntity {
         return super.toString() + "\n\n" +
                 "CHARACTERS:\n" +
                 entitiesToString(characters) + "\n" +
-                "PLAYERS:\n" +
-                entitiesToString(players) + "\n" +
                 "ARTEFACTS:\n" +
                 entitiesToString(artefacts) + "\n" +
                 "FURNITURE:\n" +

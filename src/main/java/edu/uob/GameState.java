@@ -3,9 +3,11 @@ package edu.uob;
 import com.alexmerz.graphviz.Parser;
 import com.alexmerz.graphviz.objects.Edge;
 import com.alexmerz.graphviz.objects.Graph;
+import edu.uob.action.*;
 import edu.uob.entity.Location;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -19,17 +21,31 @@ import java.util.Set;
 
 public class GameState {
 
-    Set<GameAction> actions;
+    Map<String, GameAction> actions;
     Map<String, Location> locations;
     Location startLocation;
 
     public GameState(File actionsFile, File entitiesFile) throws Exception {
         locations = new HashMap<>();
         this.getEntities(entitiesFile);
-        actions = this.getActions(actionsFile);
+        actions = this.getCustomActions(actionsFile);
+        actions.putAll(this.getBasicActions());
     }
 
-    private Set<GameAction> getActions(File actionsFile) throws Exception {
+    private Map<String, GameAction> getBasicActions() {
+
+        Map<String, GameAction> actions = new HashMap<>();
+        InventoryAction inventoryAction = new InventoryAction();
+        actions.put("inventory", inventoryAction);
+        actions.put("inv", inventoryAction);
+        actions.put("get", new GetAction());
+        actions.put("drop", new DropAction());
+        actions.put("goto", new GotoAction());
+        actions.put("look", new LookAction());
+        return actions;
+    }
+
+    private Map<String, GameAction> getCustomActions(File actionsFile) throws Exception {
 
         DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         Document document = builder.parse(actionsFile);
@@ -37,13 +53,31 @@ public class GameState {
         NodeList actionNodes = root.getChildNodes();
         int index = 1;
         Element action;
-        Set<GameAction> actions = new HashSet<>();
+        Map<String, GameAction> actions = new HashMap<>();
 
         while ((action = (Element) actionNodes.item(index)) != null) {
-            actions.add(new GameAction(action, locations));
+            Element triggers = (Element) action.getElementsByTagName("triggers").item(0);
+            Set<String> keyPhrases = getKeyPhrases(triggers);
+            CustomAction customAction = new CustomAction(action, locations);
+
+            for (String keyPhrase : keyPhrases) {
+                actions.put(keyPhrase, customAction);
+            }
             index+=2;
         }
         return actions;
+    }
+
+    private Set<String> getKeyPhrases(Element triggers) {
+
+        int index = 0;
+        Node node;
+        Set<String> keyPhrases = new HashSet<>();
+
+        while ((node = triggers.getElementsByTagName("keyphrase").item(index++)) != null) {
+            keyPhrases.add(node.getTextContent());
+        }
+        return keyPhrases;
     }
 
     private void getEntities(File entitiesFile) throws Exception {
@@ -81,8 +115,9 @@ public class GameState {
 
     public void printActions() {
 
-        for (GameAction action : actions) {
-            System.out.println(action.toString());
+        for (Map.Entry<String, GameAction> action : actions.entrySet()) {
+            System.out.println(action.getKey().toUpperCase());
+            System.out.println(action.getValue().toString());
         }
     }
 }
