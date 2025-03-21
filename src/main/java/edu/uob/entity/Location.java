@@ -5,6 +5,7 @@ import com.alexmerz.graphviz.objects.Node;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 
 public class Location extends GameEntity {
@@ -42,6 +43,14 @@ public class Location extends GameEntity {
                 furniture.putAll(Location.downCastMap(Furniture.class, entities));
             }
         }
+    }
+
+    public GameEntity getEntity(String name) {
+        if (Objects.equals(this.getName(), name)) return this;
+        if (characters.containsKey(name)) return characters.get(name);
+        if (artefacts.containsKey(name)) return artefacts.get(name);
+        if (furniture.containsKey(name)) return furniture.get(name);
+        return null;
     }
 
     public void addPath(Location location) {

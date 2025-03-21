@@ -23,19 +23,41 @@ public class EntityList {
         entities.put("characters", new HashSet<>());
     }
 
-    public void addEntity(Location location) {
-        entities.get("locations").add(location);
+    public void addEntity(GameEntity entity) {
+
+        if (entity instanceof Location) {
+            entities.get("locations").add(entity);
+        }
+        else if (entity instanceof Artefact) {
+            entities.get("artefacts").add(entity);
+        }
+        else if (entity instanceof Furniture) {
+            entities.get("furniture").add(entity);
+        }
+        else {
+            entities.get("characters").add(entity);
+        }
     }
 
-    public void addEntity(Artefact artefact) {
-        entities.get("artefacts").add(artefact);
+    public String toString() {
+
+        StringBuilder str = new StringBuilder();
+
+        for (Map.Entry<String, Set<GameEntity>> set : entities.entrySet()) {
+            if (set.getValue().isEmpty()) continue;
+            str.append(set.getKey()).append(":\n").append(entitySetToString(set.getValue())).append("\n");
+        }
+        return str.toString();
     }
 
-    public void addEntity(Furniture furniture) {
-        entities.get("furniture").add(furniture);
-    }
+    private String entitySetToString(Set<GameEntity> entities) {
+        //if (entities.isEmpty()) return "";
 
-    public void addEntity(Character character) {
-        entities.get("characters").add(character);
+        StringBuilder str = new StringBuilder();
+
+        for (GameEntity entity : entities) {
+            str.append(entity.getNameDescription()).append("\n");
+        }
+        return str.toString();
     }
 }

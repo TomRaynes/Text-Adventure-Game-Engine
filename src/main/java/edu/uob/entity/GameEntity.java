@@ -22,4 +22,8 @@ public abstract class GameEntity {
         // TODO: remove string concatenation
         return name + ": " + description;
     }
+
+    public String getNameDescription() {
+        return name + ": " + description;
+    }
 }

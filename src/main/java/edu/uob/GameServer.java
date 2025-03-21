@@ -27,9 +27,10 @@ public final class GameServer {
         // TODO implement your server logic here
 
         try {
-            GameState state = new GameState(entitiesFile);
-            state.printLocations();
-            state.printStartLocation();
+            GameState state = new GameState(actionsFile, entitiesFile);
+//            state.printLocations();
+//            state.printStartLocation();
+            state.printActions();
         }
         catch (Exception e) {
             System.out.println(e.getMessage());
