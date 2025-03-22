@@ -3,14 +3,16 @@ package edu.uob.action;
 import edu.uob.EntityList;
 import edu.uob.GameState;
 import edu.uob.entity.GameEntity;
+import edu.uob.entity.Location;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import java.util.Map;
 import java.util.Objects;
 
 public class CustomAction extends GameAction {
 
-    GameState state;
+    Map<String, Location> locations;
     private final Element action;
     private final EntityList subjects;
     private final EntityList consumed;
@@ -18,8 +20,8 @@ public class CustomAction extends GameAction {
     private final String narration;
     private int healthEffect;
 
-    public CustomAction(GameState state, Element action) {
-        this.state = state;
+    public CustomAction(Map<String, Location> locations, Element action) {
+        this.locations = locations;
         this.action = action;
         subjects = this.getEntities(this.getElement("subjects"));
         consumed = this.getEntities(this.getElement("consumed"));
@@ -41,10 +43,14 @@ public class CustomAction extends GameAction {
             }
             else healthEffect = 0;
 
-            GameEntity entity = state.getEntityFromLocations(entityNode.getTextContent());
+            GameEntity entity = GameState.getEntityFromLocations(entityNode.getTextContent(), locations);
             if (entity != null) entities.addEntity(entity);
         }
         return entities;
+    }
+
+    public EntityList getSubjects() {
+        return subjects;
     }
 
     private void setHealthEffect(String elementType) {

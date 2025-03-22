@@ -26,33 +26,26 @@ public class GameState {
 
     public GameState(File actionsFile, File entitiesFile) throws Exception {
         locations = new HashMap<>();
-        this.getEntities(entitiesFile);
+        this.getEntitiesFromFile(entitiesFile);
         actions = this.getCustomActions(actionsFile);
         actions.putAll(this.getBasicActions());
         players = new GamePlayers(startLocation);
-
-        String input = "tom: use the shovel to dig the ground";
-
-        Player player = players.getPlayer(input.substring(0, input.indexOf(':')));
-        String command = input.substring(input.indexOf(':') + 1);
-        Tokeniser tokeniser = new Tokeniser(this, command);
-        System.out.println(player.getName());
-
-        GameAction action = tokeniser.getAction();
-        EntityList entities = tokeniser.getEntities();
-        System.out.println(action.toString());
-        System.out.println(entities.toString());
     }
 
-//    public String handleCommand(String input) {
-//
-//        Player player = players.getPlayer(input.substring(0, input.indexOf(':')));
-//        String command = input.substring(input.indexOf(':') + 1);
-//        Tokeniser tokeniser = new Tokeniser(command);
-//    }
+    public String handleCommand(String input) throws Exception {
+        Player player = players.getPlayer(input.substring(0, input.indexOf(':')));
+        String command = input.substring(input.indexOf(':') + 1);
+        Tokeniser tokeniser = new Tokeniser(this, locations, player, command);
+        EntityList entities = tokeniser.getEntities();
+        GameAction action = tokeniser.getAction();
+        // if action == null,
+        BasicAction basicAction = (BasicAction) action;
+        StringBuilder sb = new StringBuilder(basicAction.performAction(player, entities));
+        return sb.append("\n").toString();
+    }
 
-    public GameEntity getEntityFromLocations(String entityName) {
-
+    public static GameEntity getEntityFromLocations(String entityName,
+                                                    Map<String, Location> locations) {
         GameEntity entity;
 
         for (Map.Entry<String, Location> location : locations.entrySet()) {
@@ -69,6 +62,10 @@ public class GameState {
             return actions.get(keyPhrase);
         }
         return null;
+    }
+
+    public Map<String, GameAction> getActions() {
+        return actions;
     }
 
     private Map<String, GameAction> getBasicActions() {
@@ -97,7 +94,7 @@ public class GameState {
         while ((action = (Element) actionNodes.item(index)) != null) {
             Element triggers = (Element) action.getElementsByTagName("triggers").item(0);
             Set<String> keyPhrases = getKeyPhrases(triggers);
-            CustomAction customAction = new CustomAction(this, action);
+            CustomAction customAction = new CustomAction(locations, action);
 
             for (String keyPhrase : keyPhrases) {
                 actions.put(keyPhrase, customAction);
@@ -119,7 +116,7 @@ public class GameState {
         return keyPhrases;
     }
 
-    private void getEntities(File entitiesFile) throws Exception {
+    private void getEntitiesFromFile(File entitiesFile) throws Exception {
 
         Parser parser = new Parser();
         FileReader reader = new FileReader(entitiesFile);

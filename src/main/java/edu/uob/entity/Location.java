@@ -2,7 +2,6 @@ package edu.uob.entity;
 
 import com.alexmerz.graphviz.objects.Graph;
 import com.alexmerz.graphviz.objects.Node;
-import edu.uob.Player;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -44,6 +43,35 @@ public class Location extends GameEntity {
         }
     }
 
+    public boolean hasNoEntities() {
+
+        if (!characters.isEmpty()) return false;
+        if (!artefacts.isEmpty()) return false;
+        if (!furniture.isEmpty()) return false;
+        return paths.isEmpty();
+    }
+
+    public String EntitiesToString() {
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(this.entitiesTypeToString(characters));
+        sb.append(this.entitiesTypeToString(artefacts));
+        sb.append(this.entitiesTypeToString(furniture));
+        sb.append(this.entitiesTypeToString(paths));
+        String str = sb.toString();
+        return str.substring(0, str.length() - 1);
+    }
+
+    private <T extends GameEntity> String entitiesTypeToString(Map<String, T> entities) {
+
+        StringBuilder sb = new StringBuilder();
+
+        for (Map.Entry<String, T> entry : entities.entrySet()) {
+            sb.append(entry.getValue().getDescription()).append("\n");
+        }
+        return sb.toString();
+    }
+
     public GameEntity getEntity(String name) {
         if (Objects.equals(this.getName(), name)) return this;
         if (characters.containsKey(name)) return characters.get(name);
@@ -52,8 +80,32 @@ public class Location extends GameEntity {
         return null;
     }
 
+    public void addArtefact(Artefact artefact) {
+        artefacts.put(artefact.getName(), artefact);
+    }
+
+    public boolean removeArtefact(Artefact artefact) {
+        return artefacts.remove(artefact.getName()) != null;
+    }
+
+    public boolean locationContains(Character character) {
+        return characters.containsValue(character);
+    }
+
+    public boolean locationContains(Artefact artefact) {
+        return artefacts.containsValue(artefact);
+    }
+
+    public boolean locationContains(Furniture furniture) {
+        return this.furniture.containsValue(furniture);
+    }
+
     public void addPath(Location location) {
         paths.put(location.getName(), location);
+    }
+
+    public Map<String, Location> getPaths() {
+        return paths;
     }
 
     private static <T extends GameEntity> Map<String, T> downCastMap(Class<T> type,

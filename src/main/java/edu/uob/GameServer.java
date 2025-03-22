@@ -48,7 +48,13 @@ public final class GameServer {
     */
     public String handleCommand(String command) {
         // TODO implement your server logic here
-        return "";
+
+        try {
+            return state.handleCommand(command);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "ERROR";
+        }
     }
 
     /**
