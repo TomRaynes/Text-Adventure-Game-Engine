@@ -1,5 +1,10 @@
 package edu.uob.action;
 
-public class InventoryAction extends GameAction {
+import edu.uob.Player;
 
+public class InventoryAction extends BasicAction {
+
+    public void performAction(Player player, String command) {
+
+    }
 }

@@ -4,6 +4,7 @@ import com.alexmerz.graphviz.Parser;
 import com.alexmerz.graphviz.objects.Edge;
 import com.alexmerz.graphviz.objects.Graph;
 import edu.uob.action.*;
+import edu.uob.entity.GameEntity;
 import edu.uob.entity.Location;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -14,22 +15,60 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
 import java.io.FileReader;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class GameState {
 
     Map<String, GameAction> actions;
     Map<String, Location> locations;
     Location startLocation;
+    GamePlayers players;
 
     public GameState(File actionsFile, File entitiesFile) throws Exception {
         locations = new HashMap<>();
         this.getEntities(entitiesFile);
         actions = this.getCustomActions(actionsFile);
         actions.putAll(this.getBasicActions());
+        players = new GamePlayers(startLocation);
+
+        String input = "tom: use the shovel to dig the ground";
+
+        Player player = players.getPlayer(input.substring(0, input.indexOf(':')));
+        String command = input.substring(input.indexOf(':') + 1);
+        Tokeniser tokeniser = new Tokeniser(this, command);
+        System.out.println(player.getName());
+
+        GameAction action = tokeniser.getAction();
+        EntityList entities = tokeniser.getEntities();
+        System.out.println(action.toString());
+        System.out.println(entities.toString());
+    }
+
+//    public String handleCommand(String input) {
+//
+//        Player player = players.getPlayer(input.substring(0, input.indexOf(':')));
+//        String command = input.substring(input.indexOf(':') + 1);
+//        Tokeniser tokeniser = new Tokeniser(command);
+//    }
+
+    public GameEntity getEntityFromLocations(String entityName) {
+
+        GameEntity entity;
+
+        for (Map.Entry<String, Location> location : locations.entrySet()) {
+            entity = location.getValue().getEntity(entityName);
+
+            if (entity != null) return entity;
+        }
+        return null;
+    }
+
+    public GameAction getAction(String keyPhrase) {
+
+        if (actions.containsKey(keyPhrase)) {
+            return actions.get(keyPhrase);
+        }
+        return null;
     }
 
     private Map<String, GameAction> getBasicActions() {
@@ -58,7 +97,7 @@ public class GameState {
         while ((action = (Element) actionNodes.item(index)) != null) {
             Element triggers = (Element) action.getElementsByTagName("triggers").item(0);
             Set<String> keyPhrases = getKeyPhrases(triggers);
-            CustomAction customAction = new CustomAction(action, locations);
+            CustomAction customAction = new CustomAction(this, action);
 
             for (String keyPhrase : keyPhrases) {
                 actions.put(keyPhrase, customAction);

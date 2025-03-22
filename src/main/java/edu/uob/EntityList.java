@@ -1,7 +1,6 @@
 package edu.uob;
 
 import edu.uob.entity.Artefact;
-import edu.uob.entity.Character;
 import edu.uob.entity.Furniture;
 import edu.uob.entity.GameEntity;
 import edu.uob.entity.Location;
@@ -16,6 +15,15 @@ public class EntityList {
     Map<String, Set<GameEntity>> entities;
 
     public EntityList() {
+        this.initialiseFields();
+    }
+
+    public EntityList(Set<GameEntity> entitySet) {
+        this.initialiseFields();
+        this.addEntities(entitySet);
+    }
+
+    private void initialiseFields() {
         entities = new HashMap<>();
         entities.put("locations", new HashSet<>());
         entities.put("artefacts", new HashSet<>());
@@ -36,6 +44,13 @@ public class EntityList {
         }
         else {
             entities.get("characters").add(entity);
+        }
+    }
+
+    private void addEntities(Set<GameEntity> entitySet) {
+
+        for (GameEntity entity : entitySet) {
+            this.addEntity(entity);
         }
     }
 

@@ -1,5 +1,10 @@
 package edu.uob.action;
 
-public class GetAction extends GameAction {
+import edu.uob.Player;
 
+public class GetAction extends BasicAction {
+
+    public void performAction(Player player, String command) {
+
+    }
 }

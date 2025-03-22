@@ -1,5 +1,6 @@
 package edu.uob;
 
+import edu.uob.action.GameAction;
 import edu.uob.entity.Artefact;
 import edu.uob.entity.Location;
 
@@ -18,5 +19,9 @@ public class Player {
         inventory = new HashMap<>();
         location = startLocation;
         health = 3;
+    }
+
+    public String getName() {
+        return name;
     }
 }

@@ -1,6 +1,5 @@
 package edu.uob;
 
-import edu.uob.entity.GameEntity;
 import edu.uob.entity.Location;
 
 import java.util.HashMap;
@@ -9,21 +8,23 @@ import java.util.Map;
 public class GamePlayers {
 
     Map<String, Player> players;
+    Location startLocation;
 
-    public GamePlayers() {
+    public GamePlayers(Location startLocation) {
+        this.startLocation = startLocation;
         players = new HashMap<>();
-    }
-
-    public void addPlayer(String name, Location startLocation) {
-        Player player = new Player(name, startLocation);
-        players.put(name, player);
     }
 
     public Player getPlayer(String name) {
 
-        if (players.containsKey(name)) {
-            return players.get(name);
+        if (!players.containsKey(name)) {
+            this.addPlayer(name);
         }
-        return null;
+        return players.get(name);
+    }
+
+    private void addPlayer(String name) {
+        Player player = new Player(name, startLocation);
+        players.put(name, player);
     }
 }

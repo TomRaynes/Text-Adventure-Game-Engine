@@ -4,14 +4,16 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.file.Paths;
+import java.util.List;
 
 public final class GameServer {
 
+    GameState state;
     private static final char END_OF_TRANSMISSION = 4;
 
     public static void main(String[] args) throws IOException {
-        File entitiesFile = Paths.get("config" + File.separator + "basic-entities.dot").toAbsolutePath().toFile();
-        File actionsFile = Paths.get("config" + File.separator + "basic-actions.xml").toAbsolutePath().toFile();
+        File entitiesFile = Paths.get("config" + File.separator + "extended-entities.dot").toAbsolutePath().toFile();
+        File actionsFile = Paths.get("config" + File.separator + "extended-actions.xml").toAbsolutePath().toFile();
         GameServer server = new GameServer(entitiesFile, actionsFile);
         server.blockingListenOn(8888);
     }
@@ -27,10 +29,10 @@ public final class GameServer {
         // TODO implement your server logic here
 
         try {
-            GameState state = new GameState(actionsFile, entitiesFile);
+            state = new GameState(actionsFile, entitiesFile);
 //            state.printLocations();
 //            state.printStartLocation();
-            state.printActions();
+//            state.printActions();
         }
         catch (Exception e) {
             System.out.println(e.getMessage());

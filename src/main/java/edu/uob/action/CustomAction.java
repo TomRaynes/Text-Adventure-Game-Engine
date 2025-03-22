@@ -1,24 +1,25 @@
 package edu.uob.action;
 
 import edu.uob.EntityList;
+import edu.uob.GameState;
 import edu.uob.entity.GameEntity;
-import edu.uob.entity.Location;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import java.util.Map;
+import java.util.Objects;
 
 public class CustomAction extends GameAction {
 
+    GameState state;
     private final Element action;
-    private final Map<String, Location> locations;
     private final EntityList subjects;
     private final EntityList consumed;
     private final EntityList produced;
     private final String narration;
+    private int healthEffect;
 
-    public CustomAction(Element action, Map<String, Location> locations) {
-        this.locations = locations;
+    public CustomAction(GameState state, Element action) {
+        this.state = state;
         this.action = action;
         subjects = this.getEntities(this.getElement("subjects"));
         consumed = this.getEntities(this.getElement("consumed"));
@@ -34,26 +35,28 @@ public class CustomAction extends GameAction {
 
         while ((entityNode = element.getElementsByTagName("entity").item(index++)) != null) {
 
-            GameEntity entity = this.getEntityFromLocations(entityNode);
+            if (Objects.equals(entityNode.getTextContent(), "health")) {
+                this.setHealthEffect(element.getTagName());
+                continue;
+            }
+            else healthEffect = 0;
+
+            GameEntity entity = state.getEntityFromLocations(entityNode.getTextContent());
             if (entity != null) entities.addEntity(entity);
         }
         return entities;
     }
 
-    private Element getElement(String elementType) {
-        return (Element) action.getElementsByTagName(elementType).item(0);
+    private void setHealthEffect(String elementType) {
+
+        if (Objects.equals(elementType, "produced")) {
+            healthEffect = 1;
+        }
+        else healthEffect = -1;
     }
 
-    private GameEntity getEntityFromLocations(Node node) {
-        String entityName = node.getTextContent();
-        GameEntity entity;
-
-        for (Map.Entry<String, Location> location : locations.entrySet()) {
-            entity = location.getValue().getEntity(entityName);
-
-            if (entity != null) return entity;
-        }
-        return null;
+    private Element getElement(String elementType) {
+        return (Element) action.getElementsByTagName(elementType).item(0);
     }
 
     public String toString() {
@@ -63,7 +66,8 @@ public class CustomAction extends GameAction {
         str.append("\nSUBJECTS:\n").append(subjects.toString()).append("CONSUMED:\n")
                 .append(consumed.toString()).append("PRODUCED:\n").append(produced.toString()).append("\n");
 
-        str.append("NARRATION: ").append(narration).append("\n_________________\n");
+        str.append("NARRATION: ").append(narration).append("\nHEALTH: ").append(healthEffect)
+                .append("\n_________________\n");
 
         return str.toString();
     }
