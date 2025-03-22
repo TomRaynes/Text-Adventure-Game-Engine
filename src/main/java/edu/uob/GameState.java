@@ -19,7 +19,7 @@ import java.util.*;
 
 public class GameState {
 
-    Map<String, GameAction> actions;
+    Map<String, Set<GameAction>> actions;
     Map<String, Location> locations;
     Location startLocation;
     GamePlayers players;
@@ -37,8 +37,8 @@ public class GameState {
         String command = input.substring(input.indexOf(':') + 1);
         Tokeniser tokeniser = new Tokeniser(this, locations, player, command);
         EntityList entities = tokeniser.getEntities();
-        GameAction action = tokeniser.getAction();
-        // if action == null,
+        GameAction action = tokeniser.getAction(entities);
+
         BasicAction basicAction = (BasicAction) action;
         StringBuilder sb = new StringBuilder(basicAction.performAction(player, entities));
         return sb.append("\n").toString();
@@ -56,7 +56,7 @@ public class GameState {
         return null;
     }
 
-    public GameAction getAction(String keyPhrase) {
+    public Set<GameAction> getAction(String keyPhrase) {
 
         if (actions.containsKey(keyPhrase)) {
             return actions.get(keyPhrase);
@@ -64,24 +64,30 @@ public class GameState {
         return null;
     }
 
-    public Map<String, GameAction> getActions() {
+    public Map<String, Set<GameAction>> getActions() {
         return actions;
     }
 
-    private Map<String, GameAction> getBasicActions() {
+    private Map<String, Set<GameAction>> getBasicActions() {
 
-        Map<String, GameAction> actions = new HashMap<>();
-        InventoryAction inventoryAction = new InventoryAction();
+        Map<String, Set<GameAction>> actions = new HashMap<>();
+        Set<GameAction> inventoryAction = this.encapsulateActionInSet(new InventoryAction());
         actions.put("inventory", inventoryAction);
         actions.put("inv", inventoryAction);
-        actions.put("get", new GetAction());
-        actions.put("drop", new DropAction());
-        actions.put("goto", new GotoAction());
-        actions.put("look", new LookAction());
+        actions.put("get", this.encapsulateActionInSet(new GetAction()));
+        actions.put("drop", this.encapsulateActionInSet(new DropAction()));
+        actions.put("goto", this.encapsulateActionInSet(new GotoAction()));
+        actions.put("look", this.encapsulateActionInSet(new LookAction()));
         return actions;
     }
 
-    private Map<String, GameAction> getCustomActions(File actionsFile) throws Exception {
+    private Set<GameAction> encapsulateActionInSet(GameAction action) {
+        Set<GameAction> actionSet = new HashSet<>();
+        actionSet.add(action);
+        return actionSet;
+    }
+
+    private Map<String, Set<GameAction>> getCustomActions(File actionsFile) throws Exception {
 
         DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         Document document = builder.parse(actionsFile);
@@ -89,7 +95,7 @@ public class GameState {
         NodeList actionNodes = root.getChildNodes();
         int index = 1;
         Element action;
-        Map<String, GameAction> actions = new HashMap<>();
+        Map<String, Set<GameAction>> actions = new HashMap<>();
 
         while ((action = (Element) actionNodes.item(index)) != null) {
             Element triggers = (Element) action.getElementsByTagName("triggers").item(0);
@@ -97,7 +103,15 @@ public class GameState {
             CustomAction customAction = new CustomAction(locations, action);
 
             for (String keyPhrase : keyPhrases) {
-                actions.put(keyPhrase, customAction);
+
+                if (actions.containsKey(keyPhrase)) {
+                    actions.get(keyPhrase).add(customAction);
+                }
+                else {
+                    Set<GameAction> actionSet = new HashSet<>();
+                    actionSet.add(customAction);
+                    actions.put(keyPhrase, actionSet);
+                }
             }
             index+=2;
         }
@@ -149,11 +163,11 @@ public class GameState {
         System.out.println("Start = " + startLocation.getName());
     }
 
-    public void printActions() {
-
-        for (Map.Entry<String, GameAction> action : actions.entrySet()) {
-            System.out.println(action.getKey().toUpperCase());
-            System.out.println(action.getValue().toString());
-        }
-    }
+//    public void printActions() {
+//
+//        for (Map.Entry<String, GameAction> action : actions.entrySet()) {
+//            System.out.println(action.getKey().toUpperCase());
+//            System.out.println(action.getValue().toString());
+//        }
+//    }
 }

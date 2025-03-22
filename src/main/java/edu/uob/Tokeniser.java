@@ -49,22 +49,27 @@ public class Tokeniser {
         return new EntityList(entitySet);
     }
 
-    public GameAction getAction() throws Exception {
+    public GameAction getAction(EntityList entities) throws Exception {
 
         Set<GameAction> actions = new HashSet<>();
 
         for (String keyPhrase : tokens) {
-            GameAction action = state.getAction(keyPhrase);
-            if (action == null) continue; // token is not key phrase
+            Set<GameAction> actionSet = state.getAction(keyPhrase);
+            if (actionSet == null) continue; // token is not key phrase
+            GameAction action = null;
 
-            // TODO: if action set size > 1, determine which is the relevant action from the subjects
+            // if action set size > 1, determine which is the relevant action from the subjects
+            if (actionSet.size() > 1) {
+                action = this.getActionFromEntities(actionSet, entities.toSet());
+            }
+            if (action == null) continue; // cant match an action with entities
 
             if (!actions.add(action)) { // key phrase is used more than once
                 throw new Exception();
             }
         }
         if (actions.isEmpty()) { // keyPhrase may contain multiple words
-            GameAction action = this.getMultiWordAction();
+            GameAction action = this.getMultiWordAction(entities);
             if (action != null) actions.add(action);
         }
         if (actions.isEmpty()) { // no action is specified
@@ -96,15 +101,24 @@ public class Tokeniser {
         return intendedAction;
     }
 
-    private GameAction getMultiWordAction() {
+    private GameAction getMultiWordAction(EntityList entities) throws Exception {
 
-        for (Map.Entry<String, GameAction> entry : state.getActions().entrySet()) {
+        GameAction action = null;
+
+        for (Map.Entry<String, Set<GameAction>> entry : state.getActions().entrySet()) {
 
             if (command.contains(entry.getKey())) {
-                return entry.getValue();
+                Set<GameAction> actionSet = entry.getValue();
+
+                if (actionSet.size() > 1) {
+                    action = this.getActionFromEntities(actionSet, entities.toSet());
+                }
+                else {
+                    action = actionSet.iterator().next();
+                }
             }
         }
-        return null;
+        return action;
     }
 
     private String normaliseCommand(String command) {
