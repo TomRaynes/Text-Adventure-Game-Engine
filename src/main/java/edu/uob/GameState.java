@@ -78,6 +78,7 @@ public class GameState {
         actions.put("drop", this.encapsulateActionInSet(new DropAction()));
         actions.put("goto", this.encapsulateActionInSet(new GotoAction()));
         actions.put("look", this.encapsulateActionInSet(new LookAction()));
+        actions.put("health", this.encapsulateActionInSet(new HealthAction()));
         return actions;
     }
 

@@ -33,12 +33,17 @@ public class CustomAction extends GameAction {
 
     public String performAction(Player player, EntityList entities) throws Exception {
 
-        this.checkForExtraneousEntities(entities);
+        this.checkValidityOfEntities(entities);
         this.checkAvailabilityOfEntities(player);
         this.consumeEntities(player);
         this.produceEntities(player.getLocation());
-        player.updateHealth(healthEffect);
-        return narration;
+        String deathMessage = player.updateHealth(healthEffect);
+        StringBuilder sb = new StringBuilder(narration);
+
+        if (!deathMessage.isEmpty()) {
+            sb.append("\n\n").append(deathMessage);
+        }
+        return sb.toString();
     }
 
     private void produceEntities(Location location) throws Exception {
@@ -93,7 +98,11 @@ public class CustomAction extends GameAction {
         }
     }
 
-    private void checkForExtraneousEntities(EntityList entities) throws Exception {
+    private void checkValidityOfEntities(EntityList entities) throws Exception {
+
+        if (entities.isEmpty()) {
+            throw new Exception(); // action must contain at least one entity
+        }
 
         Set<GameEntity> extraneousEntities = new HashSet<>();
 

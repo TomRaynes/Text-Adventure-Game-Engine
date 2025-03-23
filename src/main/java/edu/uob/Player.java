@@ -1,20 +1,25 @@
 package edu.uob;
 
+import edu.uob.entity.Artefact;
 import edu.uob.entity.GameEntity;
 import edu.uob.entity.Inventory;
 import edu.uob.entity.Location;
 
+import java.util.Map;
+
 public class Player {
 
-    String name;
-    Inventory inventory;
-    Location location;
-    int health;
+    private final String name;
+    private Inventory inventory;
+    private Location location;
+    private final Location startLocation;
+    private int health;
 
     public Player(String name, Location startLocation) {
         this.name = name;
         inventory = new Inventory(null, null);
         location = startLocation;
+        this.startLocation = startLocation;
         health = 3;
     }
 
@@ -22,17 +27,31 @@ public class Player {
         location.addPlayer(this);
     }
 
-    public void updateHealth(int healthEffect) {
+    public String updateHealth(int healthEffect) throws Exception {
         health += healthEffect;
+
+        if (health > 3) {
+            health = 3;
+        }
+        if (health < 1) {
+            health = 3;
+            return this.runDeathSequence();
+        }
+        return "";
     }
 
-    public boolean setLocation(Location location) throws Exception {
+    public int getHealth() {
+        return health;
+    }
 
-        if (this.location.getPaths().containsKey(location.getName())) {
-            this.location = location;
-            return true;
+    private String runDeathSequence() throws Exception {
+
+        for (Map.Entry<String, Artefact> entry : inventory) {
+            entry.getValue().moveEntity(location, inventory);
         }
-        return false;
+        location = startLocation;
+
+        return "You died and lost all of your items. You must return to the start of the game";
     }
 
     public void moveLocation(Location toLocation) throws Exception {

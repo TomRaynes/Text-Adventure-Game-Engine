@@ -30,9 +30,6 @@ public final class GameServer {
 
         try {
             state = new GameState(actionsFile, entitiesFile);
-//            state.printLocations();
-//            state.printStartLocation();
-//            state.printActions();
         }
         catch (Exception e) {
             System.out.println(e.getMessage());
@@ -53,7 +50,7 @@ public final class GameServer {
             return state.handleCommand(command);
         } catch (Exception e) {
             e.printStackTrace();
-            return "ERROR";
+            return "ERROR\n";
         }
     }
 
