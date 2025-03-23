@@ -4,6 +4,7 @@ import edu.uob.action.CustomAction;
 import edu.uob.action.GameAction;
 import edu.uob.entity.GameEntity;
 import edu.uob.entity.Location;
+import edu.uob.entity.ObjectEntity;
 
 import java.util.*;
 

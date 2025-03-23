@@ -2,13 +2,15 @@ package edu.uob.action;
 
 import edu.uob.EntityList;
 import edu.uob.GameState;
-import edu.uob.entity.GameEntity;
-import edu.uob.entity.Location;
+import edu.uob.Player;
+import edu.uob.entity.*;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 public class CustomAction extends GameAction {
 
@@ -27,6 +29,82 @@ public class CustomAction extends GameAction {
         consumed = this.getEntities(this.getElement("consumed"));
         produced = this.getEntities(this.getElement("produced"));
         narration = this.getElement("narration").getTextContent();
+    }
+
+    public String performAction(Player player, EntityList entities) throws Exception {
+
+        this.checkForExtraneousEntities(entities);
+        this.checkAvailabilityOfEntities(player);
+        this.consumeEntities(player);
+        this.produceEntities(player.getLocation());
+        player.updateHealth(healthEffect);
+        return narration;
+    }
+
+    private void produceEntities(Location location) throws Exception {
+
+        for (GameEntity entity : produced.toSet()) {
+
+            if (entity instanceof Location path) {
+                location.addEntity(path);
+            }
+            else {
+                ObjectEntity objectEntity = (ObjectEntity) entity;
+                objectEntity.moveEntity(location, (Container) null);
+            }
+        }
+    }
+
+    private void consumeEntities(Player player) throws Exception {
+
+        Location location = player.getLocation();
+        Inventory inventory = player.getInventory();
+
+        for (GameEntity entity : consumed.toSet()) {
+
+            if (entity instanceof Location path) {
+                location.removeEntity(path);
+            }
+            else {
+                ObjectEntity objectEntity = (ObjectEntity) entity;
+                objectEntity.moveEntity(this.getStoreroom(), location, inventory);
+            }
+        }
+    }
+
+    private Location getStoreroom() {
+        return locations.get("storeroom");
+    }
+
+    private void checkAvailabilityOfEntities(Player player) throws Exception {
+
+        Location location = player.getLocation();
+        Inventory inventory = player.getInventory();
+        Set<GameEntity> entities = subjects.toSet(); // subject entities of action
+        entities.addAll(consumed.toSet());
+
+        for (GameEntity entity : entities) {
+
+            if (location.contains(entity) || inventory.contains(entity)) {
+                continue;
+            }
+            System.out.println(entity.getName());
+            throw new Exception(); // entity is not in inventory or current location
+        }
+    }
+
+    private void checkForExtraneousEntities(EntityList entities) throws Exception {
+
+        Set<GameEntity> extraneousEntities = new HashSet<>();
+
+        for (GameEntity entity : entities.toSet()) {
+
+            if (!subjects.containsEntity(entity)) {
+                extraneousEntities.add(entity);
+            }
+        }
+        if (extraneousEntities.isEmpty()) return;
+        throw new Exception();
     }
 
     private EntityList getEntities(Element element) {

@@ -13,13 +13,13 @@ public class LookAction extends BasicAction {
         }
         Location location = player.getLocation();
         StringBuilder sb = new StringBuilder("You are in ");
-        sb.append(location.getDescription().toLowerCase()).append("\n");
+        sb.append(location.getDescription().toLowerCase()).append(". ");
 
         if (location.hasNoEntities()) {
             sb.append("Nothing can be seen");
             return sb.toString();
         }
-        sb.append("You can see:\n").append(location.EntitiesToString());
+        sb.append("You can see:\n").append(location.playersAndEntitiesToString(player));
         return sb.toString();
     }
 }

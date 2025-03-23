@@ -2,14 +2,14 @@ package edu.uob.entity;
 
 import com.alexmerz.graphviz.objects.Graph;
 import com.alexmerz.graphviz.objects.Node;
+import edu.uob.Player;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Function;
 
-public class Location extends GameEntity {
+public class Location extends Container {
 
+    private Map<String, Player> players;
     private Map<String, Character> characters;
     private Map<String, Artefact> artefacts;
     private Map<String, Furniture> furniture;
@@ -19,6 +19,7 @@ public class Location extends GameEntity {
         super(graph.getNodes(false).get(0).getId().getId(),
               graph.getNodes(false).get(0).getAttribute("description"));
 
+        players = new HashMap<>();
         characters = new HashMap<>();
         artefacts = new HashMap<>();
         furniture = new HashMap<>();
@@ -43,6 +44,27 @@ public class Location extends GameEntity {
         }
     }
 
+    public void addPlayer(Player player) {
+        players.put(player.getName(), player);
+    }
+
+    public void removePlayer(Player player) {
+        players.remove(player.getName());
+    }
+
+    public void initialiseAllEntityLocations() {
+        this.initialiseEntityLocations(characters);
+        this.initialiseEntityLocations(artefacts);
+        this.initialiseEntityLocations(furniture);
+    }
+
+    private <T extends ObjectEntity> void initialiseEntityLocations(Map<String, T> entities) {
+
+        for (Map.Entry<String, T> entry : entities.entrySet()) {
+            entry.getValue().setContainer(this);
+        }
+    }
+
     public boolean hasNoEntities() {
 
         if (!characters.isEmpty()) return false;
@@ -51,13 +73,18 @@ public class Location extends GameEntity {
         return paths.isEmpty();
     }
 
-    public String EntitiesToString() {
+    public String playersAndEntitiesToString(Player activePlayer) {
 
         StringBuilder sb = new StringBuilder();
         sb.append(this.entitiesTypeToString(characters));
         sb.append(this.entitiesTypeToString(artefacts));
         sb.append(this.entitiesTypeToString(furniture));
         sb.append(this.entitiesTypeToString(paths));
+
+        for (Player player : players.values()) {
+            if (player == activePlayer) continue;
+            sb.append(player.getName()).append(", a fellow adventurer\n");
+        }
         String str = sb.toString();
         return str.substring(0, str.length() - 1);
     }
@@ -72,36 +99,54 @@ public class Location extends GameEntity {
         return sb.toString();
     }
 
-    public GameEntity getEntity(String name) {
-        if (Objects.equals(this.getName(), name)) return this;
-        if (characters.containsKey(name)) return characters.get(name);
-        if (artefacts.containsKey(name)) return artefacts.get(name);
-        if (furniture.containsKey(name)) return furniture.get(name);
+    public GameEntity getEntity(String entityName) {
+        if (Objects.equals(this.getName(), entityName)) return this;
+        if (characters.containsKey(entityName)) return characters.get(entityName);
+        if (artefacts.containsKey(entityName)) return artefacts.get(entityName);
+        if (furniture.containsKey(entityName)) return furniture.get(entityName);
         return null;
     }
 
-    public void addArtefact(Artefact artefact) {
-        artefacts.put(artefact.getName(), artefact);
+    public void addEntity(GameEntity entity) {
+
+        if (entity instanceof Character character) {
+            characters.put(character.getName(), character);
+        }
+        else if (entity instanceof Artefact artefact) {
+            artefacts.put(artefact.getName(), artefact);
+        }
+        else if (entity instanceof Location path) {
+            paths.put(path.getName(), path);
+        }
+        else furniture.put(entity.getName(), (Furniture) entity);
     }
 
-    public boolean removeArtefact(Artefact artefact) {
-        return artefacts.remove(artefact.getName()) != null;
+    public void removeEntity(GameEntity entity) {
+
+        if (entity instanceof Character) {
+            characters.remove(entity.getName());
+        }
+        if (entity instanceof Artefact) {
+            artefacts.remove(entity.getName());
+        }
+        if (entity instanceof Furniture) {
+            furniture.remove(entity.getName());
+        }
+        else paths.remove(entity.getName());
     }
 
-    public boolean locationContains(Character character) {
-        return characters.containsValue(character);
-    }
+    public boolean contains(GameEntity entity) {
 
-    public boolean locationContains(Artefact artefact) {
-        return artefacts.containsValue(artefact);
-    }
-
-    public boolean locationContains(Furniture furniture) {
-        return this.furniture.containsValue(furniture);
-    }
-
-    public void addPath(Location location) {
-        paths.put(location.getName(), location);
+        if (entity instanceof Character) {
+            return characters.containsKey(entity.getName());
+        }
+        if (entity instanceof Artefact) {
+            return artefacts.containsKey(entity.getName());
+        }
+        if (entity instanceof Furniture) {
+            return this.furniture.containsKey(entity.getName());
+        }
+        else return true; // Any location can be subject/consumed/produced
     }
 
     public Map<String, Location> getPaths() {

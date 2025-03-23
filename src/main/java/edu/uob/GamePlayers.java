@@ -25,6 +25,7 @@ public class GamePlayers {
 
     private void addPlayer(String name) {
         Player player = new Player(name, startLocation);
+        player.addPlayerToLocation();
         players.put(name, player);
     }
 }

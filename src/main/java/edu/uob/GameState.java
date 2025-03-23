@@ -4,8 +4,10 @@ import com.alexmerz.graphviz.Parser;
 import com.alexmerz.graphviz.objects.Edge;
 import com.alexmerz.graphviz.objects.Graph;
 import edu.uob.action.*;
+import edu.uob.entity.Container;
 import edu.uob.entity.GameEntity;
 import edu.uob.entity.Location;
+import edu.uob.entity.ObjectEntity;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -38,9 +40,7 @@ public class GameState {
         Tokeniser tokeniser = new Tokeniser(this, locations, player, command);
         EntityList entities = tokeniser.getEntities();
         GameAction action = tokeniser.getAction(entities);
-
-        BasicAction basicAction = (BasicAction) action;
-        StringBuilder sb = new StringBuilder(basicAction.performAction(player, entities));
+        StringBuilder sb = new StringBuilder(action.performAction(player, entities));
         return sb.append("\n").toString();
     }
 
@@ -138,17 +138,19 @@ public class GameState {
         Graph wholeDocument = parser.getGraphs().get(0);
         Graph startLocation = wholeDocument.getSubgraphs().get(0).getSubgraphs().get(0);
         this.startLocation = new Location(startLocation);
+        this.startLocation.initialiseAllEntityLocations();
         locations.put(this.startLocation.getName(), this.startLocation);
         wholeDocument.getSubgraphs().get(0).getSubgraphs().remove(0);
 
         for (Graph graph : wholeDocument.getSubgraphs().get(0).getSubgraphs()) {
             Location location = new Location(graph);
+            location.initialiseAllEntityLocations(); // set all entity locations to current location
             locations.put(location.getName(), location);
         }
         for (Edge edge : wholeDocument.getSubgraphs().get(1).getEdges()) {
             Location fromLocation = locations.get(edge.getSource().getNode().getId().getId());
             Location toLocation = locations.get(edge.getTarget().getNode().getId().getId());
-            fromLocation.addPath(toLocation);
+            fromLocation.addEntity(toLocation);
         }
     }
 
