@@ -46,25 +46,29 @@ public class Player {
 
     private String runDeathSequence() throws Exception {
 
-        for (Map.Entry<String, Artefact> entry : inventory) {
-            entry.getValue().moveEntity(location, inventory);
+        for (Artefact artefact : inventory) {
+            artefact.moveEntity(location, inventory);
         }
         location = startLocation;
 
         return "You died and lost all of your items. You must return to the start of the game";
     }
 
-    public void moveLocation(Location toLocation) throws Exception {
+    public void moveLocation(GameEntity entity) throws Exception {
 
-        Location fromLocation = this.location;
+        if (entity instanceof Location toLocation) {
 
-        if (fromLocation.getPaths().containsKey(toLocation.getName())) {
-            this.location = toLocation;
+            Location fromLocation = this.location;
+
+            if (fromLocation.getPaths().containsKey(toLocation.getName())) {
+                this.location = toLocation;
+            }
+            else throw new Exception(); // no path to location
+
+            fromLocation.removePlayer(this);
+            this.location.addPlayer(this);
         }
-        else throw new Exception(); // no path to location
-
-        fromLocation.removePlayer(this);
-        this.location.addPlayer(this);
+        else throw new Exception(); // entity is not a location
     }
 
     public Location getLocation() {
@@ -81,5 +85,10 @@ public class Player {
 
     public Inventory getInventory() {
         return inventory;
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }

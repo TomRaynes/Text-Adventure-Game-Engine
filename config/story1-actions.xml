@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+    <action>
+        <triggers>
+            <keyphrase>open</keyphrase>
+            <keyphrase>unlock</keyphrase>
+        </triggers>
+        <subjects>
+            <entity>lamborghini</entity>
+            <entity>keys</entity>
+        </subjects>
+        <consumed>
+            <entity>lamborghini</entity>
+            <entity>keys</entity>
+            <entity>gang</entity>
+            <entity>health</entity>
+        </consumed>
+        <produced>
+            <entity>rolex</entity>
+            <entity>shop</entity>
+        </produced>
+        <narration>You unlock your laborghini but you are spotted by the gang of youths who rob you and steal your lamborghini. However, during the altercation, you manage to steal one of their rolexes before they get away. In your despiration, you see a pawn shown across the street.</narration>
+    </action>
+
+    <action>
+        <triggers>
+            <keyphrase>trade</keyphrase>
+            <keyphrase>sell</keyphrase>
+            <keyphrase>give</keyphrase>
+            <keyphrase>bargin</keyphrase>
+            <keyphrase>exchange</keyphrase>
+        </triggers>
+        <subjects>
+            <entity>rolex</entity>
+            <entity>trevor</entity>
+        </subjects>
+        <consumed>
+            <entity>rolex</entity>
+        </consumed>
+        <produced>
+            <entity>rock</entity>
+        </produced>
+        <narration>You bargin with Trevor to get the best offer you can for the luxury item but unfortunately your negotiation skills are shite and all he offers you is a rock. You accept this offer. Maybe you can use it to break into a vehicle.</narration>
+    </action>
+
+    <action>
+        <triggers>
+            <keyphrase>break</keyphrase>
+            <keyphrase>throw</keyphrase>
+            <keyphrase>smash</keyphrase>
+        </triggers>
+        <subjects>
+            <entity>van</entity>
+            <entity>rock</entity>
+        </subjects>
+        <consumed>
+            <entity>rock</entity>
+        </consumed>
+        <produced>
+            <entity>ladder</entity>
+            <entity>hostage</entity>
+        </produced>
+        <narration>You break into the van with the rock. In the back of the van you see a hostage who is chained up and trembling in fear. He tells you that he was imprissoned and was forced to synthesise viagra for a venezuelan street gang. He begs you to free him but you tell him its a bit inconvenient and you dont really have time. At that moment a ladder catches your attention behind the hostage. Reluctantly, you free the hostage to get to the ladder</narration>
+    </action>
+
+    <action>
+        <triggers>
+            <keyphrase>climb</keyphrase>
+            <keyphrase>scale</keyphrase>
+        </triggers>
+        <subjects>
+            <entity>ladder</entity>
+            <entity>window</entity>
+        </subjects>
+        <consumed>
+            <entity>ladder</entity>
+        </consumed>
+        <produced>
+            <entity>room</entity>
+        </produced>
+        <narration>You climb up the ladder and you can now see into a dark, damp room.</narration>
+    </action>
+
+    <action>
+        <triggers>
+            <keyphrase>smoke</keyphrase>
+            <keyphrase>do</keyphrase>
+        </triggers>
+        <subjects>
+            <entity>crack</entity>
+        </subjects>
+        <consumed>
+        </consumed>
+        <produced>
+            <entity>glock</entity>
+            <entity>crackhead</entity>
+            <entity>health</entity>
+        </produced>
+        <narration> After you sit down on the mattress and smoke some crack, gaining some health, you notice a black handgun on the floor by your feet. Suddenly, you burst into a crack induced fit of range when you notice a local crackhead in the corner who you think is trying to steal your crack.</narration>
+    </action>
+
+    <action>
+        <triggers>
+            <keyphrase>kill</keyphrase>
+            <keyphrase>shoot</keyphrase>
+        </triggers>
+        <subjects>
+            <entity>crackhead</entity>
+        </subjects>
+        <consumed>
+            <entity>crackhead</entity>
+        </consumed>
+        <produced>
+            <entity>chris</entity>
+        </produced>
+        <narration>You shoot the crackhead and watch him slowly bleed out. You revel in the beauty of watching the light leave his eyes. All of a sudden Chris Hansen bursts through the door followed by a camera crew as it turns out that the dead crackhead was grooming a 12 year old girl on snapchat. Disappointed that he can no longer finish the show, Chris&apos;s eyes light up when he sees the crack.</narration>
+    </action>
+
+    <action>
+        <triggers>
+            <keyphrase>give</keyphrase>
+            <keyphrase>offer</keyphrase>
+        </triggers>
+        <subjects>
+            <entity>crack</entity>
+            <entity>chris</entity>
+        </subjects>
+        <consumed>
+            <entity>chris</entity>
+        </consumed>
+        <produced>
+            <entity>key</entity>
+        </produced>
+        <narration>You give Chris Hansen some crack. As he is taking a hit, his eyes widen has he looks up at you. Then, in a moment of inner nirvana, Chris Hansen spontaneously combusts and showers the room in a waterfall blood and bits of internal organs. You think to yourself that this is unexpected when you notice that Chris has dropped a key to a van on the floor while spontaneously combusting. It must have belonged the crackhead nonce.</narration>
+    </action>
+
+    <action>
+        <triggers>
+            <keyphrase>start</keyphrase>
+            <keyphrase>unlock</keyphrase>
+        </triggers>
+        <subjects>
+            <entity>key</entity>
+            <entity>van</entity>
+        </subjects>
+        <consumed>
+        </consumed>
+        <produced>
+            <entity>home</entity>
+        </produced>
+        <narration>You start the engine of the van with the key enabling you to finally drive home.</narration>
+    </action>
+
+    <action>
+        <triggers>
+            <keyphrase>give</keyphrase>
+            <keyphrase>offer</keyphrase>
+            <keyphrase>pay</keyphrase>
+        </triggers>
+        <subjects>
+            <entity>hostage</entity>
+            <entity>crack</entity>
+        </subjects>
+        <consumed>
+            <entity>crack</entity>
+        </consumed>
+        <produced>
+            <entity>viagra</entity>
+        </produced>
+        <narration>You give the hostage the rest of your crack as farewell gift. In return he gives you a small blue pill of a novel viagra research chemical analogue. A fair exchange.</narration>
+    </action>
+
+    <action>
+        <triggers>
+            <keyphrase>have sex</keyphrase>
+            <keyphrase>fuck</keyphrase>
+        </triggers>
+        <subjects>
+            <entity>girlfriend</entity>
+            <entity>viagra</entity>
+        </subjects>
+        <consumed>
+            <entity>viagra</entity>
+        </consumed>
+        <produced>
+        </produced>
+        <narration>You take the viagra and have sex with your girlfriend. The end.</narration>
+    </action>
+
+</actions>

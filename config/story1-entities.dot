@@ -1,0 +1,99 @@
+digraph layout {
+    /* ortho splines just makes the arrows into straight lines (rather than curvy ones !) */
+    splines = ortho;
+    node [shape = "rect"];
+
+    subgraph locations {
+        subgraph cluster001 {
+            node [shape = "none"];
+            hood [description = "'Da Hood' in downtown LA"];
+            subgraph artefacts {
+                node [shape = "diamond"];
+                keys [description = "Your car keys"];
+            }
+            subgraph furniture {
+                node [shape = "hexagon"];
+                window [description = "A broken window into the first floor of a crack house"];
+            }
+        }
+
+        subgraph cluster002 {
+            node [shape = "none"];
+            corner [description = "A dodgy street corner"];
+            subgraph characters {
+                node [shape = "diamond"];
+            }
+            subgraph furniture {
+                node [shape = "hexagon"];
+                lamborghini [description = "Your shiny brand new lamborghini"]
+                gang [description = "A gang of youths"]
+                van [description = "An old white van"]
+
+            }
+        }
+
+        subgraph cluster003 {
+            node [shape = "none"];
+            shop [description = "A sleazy pawn shop"]
+            subgraph characters {
+                node [shape = "ellipse"];
+                trevor [description = "Trevor, owner of the establishment"];
+            }
+        }
+
+
+        subgraph cluster004 {
+            node [shape = "none"];
+            room [description = "A damp and graffitied room with a mattress on the floor"]
+            subgraph artefacts {
+                node [shape = "diamond"];
+                crack [description = "A baggie of LA's finest crack"]
+            }
+            subgraph characters {
+                node [shape = "ellipse"];
+            }
+        }
+
+        subgraph cluster005 {
+            node [shape = "none"];
+            home [description = "Your home, a multi-million dollar mansion in the hollywood hills"]
+            subgraph characters {
+                node [shape = "ellipse"];
+                girlfriend [description = "Your super-model girlfriend who is horny but you had a wank earlier so you cant get a rod on"];
+            }
+        }
+
+
+        subgraph cluster999 {
+            node [shape = "none"];
+            storeroom [description = "Storage for any entities not placed in the game"]
+            subgraph characters {
+                node [shape = "ellipse"];
+                crackhead [description = "A local crackhead tweaking out in the corner"];
+                chris [description = "chris hansen"]
+                hostage [description = "The freed hostage"]
+            }
+            subgraph artefacts {
+                node [shape = "diamond"];
+                rolex [description = "A gold rolex"];
+                rock [description = "A rock"]
+                ladder [description = "An extendable ladder"]
+                glock [description = "A glock G17"]
+                viagra [description = "A blue viagra pill"]
+                key [description = "The key to the van"];
+            }
+            subgraph furniture {
+                node [shape = "hexagon"];
+            }
+        }
+    }
+
+    subgraph paths {
+        hood -> corner;
+        corner -> hood;
+        shop -> corner;
+        room -> hood;
+        home -> corner
+    }
+
+}

@@ -1,133 +1,54 @@
 package edu.uob;
 
-import edu.uob.entity.Artefact;
-import edu.uob.entity.Furniture;
 import edu.uob.entity.GameEntity;
-import edu.uob.entity.Location;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Consumer;
 
-public class EntityList {
+public class EntityList implements Iterable<GameEntity> {
 
-    Map<String, Set<GameEntity>> entities;
+    Set<GameEntity> entities;
 
     public EntityList() {
-        this.initialiseFields();
+        entities = new HashSet<>();
     }
 
     public EntityList(Set<GameEntity> entitySet) {
-        this.initialiseFields();
-        this.addEntities(entitySet);
+        entities = new HashSet<>(entitySet);
     }
 
-    private void initialiseFields() {
-        entities = new HashMap<>();
-        entities.put("locations", new HashSet<>());
-        entities.put("artefacts", new HashSet<>());
-        entities.put("furniture", new HashSet<>());
-        entities.put("characters", new HashSet<>());
-    }
+    public EntityList(EntityList... entityLists) {
+        entities = new HashSet<>();
 
-    private void addEntityPrivate(GameEntity entity) {
-
-        if (entity instanceof Location) {
-            entities.get("locations").add(entity);
-        }
-        else if (entity instanceof Artefact) {
-            entities.get("artefacts").add(entity);
-        }
-        else if (entity instanceof Furniture) {
-            entities.get("furniture").add(entity);
-        }
-        else {
-            entities.get("characters").add(entity);
+        for (EntityList entityList : entityLists) {
+            this.addEntities(entityList);
         }
     }
 
     public void addEntity(GameEntity entity) {
-        this.addEntityPrivate(entity);
-    }
-
-    public Set<GameEntity> getEntitiesOfType(String type) throws Exception {
-
-        return switch (type) {
-            case "location" -> entities.get("locations");
-            case "artefact" -> entities.get("artefacts");
-            case "furniture" -> entities.get("furniture");
-            case "character" -> entities.get("characters");
-            default -> throw new Exception();
-        };
+        entities.add(entity);
     }
 
     public boolean containsEntity(GameEntity entity) {
-
-        if (entity instanceof Location) {
-            return entities.get("locations").contains(entity);
-        }
-        else if (entity instanceof Artefact) {
-            return entities.get("artefacts").contains(entity);
-        }
-        else if (entity instanceof Furniture) {
-            return entities.get("furniture").contains(entity);
-        }
-        else {
-            return entities.get("characters").contains(entity);
-        }
+        return entities.contains(entity);
     }
 
-    public Set<GameEntity> toSet() throws Exception {
+    private void addEntities(EntityList entities) {
 
-        Set<GameEntity> entities = new HashSet<>();
-        entities.addAll(this.getEntitiesOfType("location"));
-        entities.addAll(this.getEntitiesOfType("artefact"));
-        entities.addAll(this.getEntitiesOfType("furniture"));
-        entities.addAll(this.getEntitiesOfType("character"));
-        return entities;
-    }
-
-    private void addEntities(Set<GameEntity> entitySet) {
-
-        for (GameEntity entity : entitySet) {
-            this.addEntityPrivate(entity);
+        for (GameEntity entity : entities) {
+            this.addEntity(entity);
         }
     }
 
     public boolean isEmpty() {
-
-        for (Map.Entry<String, Set<GameEntity>> entry : entities.entrySet()) {
-
-            if (!entry.getValue().isEmpty()) {
-                return false;
-            }
-        }
-        return true;
+        return entities.isEmpty();
     }
 
     public int getSize() {
-
-        int size = 0;
-
-        for (Map.Entry<String, Set<GameEntity>> entry : entities.entrySet()) {
-            size += entry.getValue().size();
-        }
-        return size;
+        return entities.size();
     }
 
     public String toString() {
-
-        StringBuilder str = new StringBuilder();
-
-        for (Map.Entry<String, Set<GameEntity>> set : entities.entrySet()) {
-            if (set.getValue().isEmpty()) continue;
-            str.append(set.getKey()).append(":\n").append(entitySetToString(set.getValue())).append("\n");
-        }
-        return str.toString();
-    }
-
-    private String entitySetToString(Set<GameEntity> entities) {
 
         StringBuilder str = new StringBuilder();
 
@@ -135,5 +56,15 @@ public class EntityList {
             str.append(entity.getNameDescription()).append("\n");
         }
         return str.toString();
+    }
+
+    @Override
+    public Iterator<GameEntity> iterator() {
+        return entities.iterator();
+    }
+
+    @Override
+    public void forEach(Consumer<? super GameEntity> action) {
+        entities.forEach(action);
     }
 }

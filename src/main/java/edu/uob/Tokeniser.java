@@ -41,6 +41,9 @@ public class Tokeniser {
             if (entity == null) { // entity may be artefact in player inventory
                 entity = player.getEntityFromInventory(entityName);
             }
+            if (entity == null && this.getEntityFromAllInventories(entityName) != null) {
+                throw new Exception(); // entity in another players inventory
+            }
             if (entity == null) continue; // token is not an entity
 
             if (!entitySet.add(entity)) { // entity is given more than once
@@ -48,6 +51,22 @@ public class Tokeniser {
             }
         }
         return new EntityList(entitySet);
+    }
+
+    private GameEntity getEntityFromAllInventories(String entityName) {
+
+        GamePlayers players = state.getPlayers();
+
+        for (Player player : players) {
+            GameEntity entity = player.getEntityFromInventory(entityName);
+            System.out.println(player.getName());
+
+            if (entity != null) {
+                System.out.println(entity.getName());
+                return entity;
+            }
+        }
+        return null;
     }
 
     public GameAction getAction(EntityList entities) throws Exception {
@@ -61,7 +80,7 @@ public class Tokeniser {
 
             // if action set size > 1, determine which is the relevant action from the subjects
             if (actionSet.size() > 1) {
-                action = this.getActionFromEntities(actionSet, entities.toSet());
+                action = this.getActionFromEntities(actionSet, entities);
             }
             if (action == null) continue; // cant match an action with entities
 
@@ -82,7 +101,7 @@ public class Tokeniser {
         return actions.iterator().next();
     }
 
-    public GameAction getActionFromEntities(Set<GameAction> actions, Set<GameEntity> entities) {
+    public GameAction getActionFromEntities(Set<GameAction> actions, EntityList entities) {
 
         GameAction intendedAction = null;
         int currentMatches = 0;
@@ -98,6 +117,9 @@ public class Tokeniser {
                 intendedAction = action;
                 currentMatches = matches;
             }
+            else if (matches == currentMatches) {
+                intendedAction = null;
+            }
         }
         return intendedAction;
     }
@@ -112,7 +134,7 @@ public class Tokeniser {
                 Set<GameAction> actionSet = entry.getValue();
 
                 if (actionSet.size() > 1) {
-                    action = this.getActionFromEntities(actionSet, entities.toSet());
+                    action = this.getActionFromEntities(actionSet, entities);
                 }
                 else {
                     action = actionSet.iterator().next();

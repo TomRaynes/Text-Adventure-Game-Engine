@@ -1,11 +1,15 @@
 package edu.uob;
 
+import edu.uob.entity.Artefact;
 import edu.uob.entity.Location;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
-public class GamePlayers {
+public class GamePlayers implements Iterable<Player> {
 
     Map<String, Player> players;
     Location startLocation;
@@ -27,5 +31,14 @@ public class GamePlayers {
         Player player = new Player(name, startLocation);
         player.addPlayerToLocation();
         players.put(name, player);
+    }
+
+    @Override
+    public Iterator<Player> iterator() {
+        return players.values().iterator();
+    }
+
+    public void forEach(Consumer<? super Player> action) {
+        players.values().forEach(action);
     }
 }

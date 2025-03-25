@@ -107,46 +107,49 @@ public class Location extends Container {
         return null;
     }
 
-    public void addEntity(GameEntity entity) {
+    public boolean containsEntity(GameEntity entity) {
 
-        if (entity instanceof Character character) {
-            characters.put(character.getName(), character);
-        }
-        else if (entity instanceof Artefact artefact) {
-            artefacts.put(artefact.getName(), artefact);
-        }
-        else if (entity instanceof Location path) {
-            paths.put(path.getName(), path);
-        }
-        else furniture.put(entity.getName(), (Furniture) entity);
-    }
-
-    public void removeEntity(GameEntity entity) {
-
-        if (entity instanceof Character) {
-            characters.remove(entity.getName());
-        }
-        if (entity instanceof Artefact) {
-            artefacts.remove(entity.getName());
-        }
-        if (entity instanceof Furniture) {
-            furniture.remove(entity.getName());
-        }
-        else paths.remove(entity.getName());
-    }
-
-    public boolean contains(GameEntity entity) {
-
-        if (entity instanceof Character) {
-            return characters.containsKey(entity.getName());
-        }
-        if (entity instanceof Artefact) {
-            return artefacts.containsKey(entity.getName());
-        }
-        if (entity instanceof Furniture) {
-            return this.furniture.containsKey(entity.getName());
-        }
+        if (entity instanceof Character) return characters.containsKey(entity.getName());
+        if (entity instanceof Artefact) return artefacts.containsKey(entity.getName());
+        if (entity instanceof Furniture) return this.furniture.containsKey(entity.getName());
         else return true; // Any location can be subject/consumed/produced
+    }
+
+    public void addEntity(Artefact artefact) {
+        artefacts.put(artefact.getName(), artefact);
+    }
+
+    public void addEntity(Character character) {
+        characters.put(character.getName(), character);
+    }
+
+    public void addEntity(Furniture furniture) {
+        this.furniture.put(furniture.getName(), furniture);
+    }
+
+    public void addEntity(Location path) {
+        paths.put(path.getName(), path);
+    }
+
+    @Override
+    public void moveEntity(Container toLocation, Container... fromLocations) throws Exception {
+        throw new Exception(); // location cant be moved
+    }
+
+    public void removeEntity(Artefact artefact) {
+        artefacts.remove(artefact.getName());
+    }
+
+    public void removeEntity(Character character) {
+        characters.remove(character.getName());
+    }
+
+    public void removeEntity(Furniture furniture) {
+        this.furniture.remove(furniture.getName());
+    }
+
+    public void removeEntity(Location path) {
+        paths.remove(path.getName());
     }
 
     public Map<String, Location> getPaths() {
@@ -221,14 +224,16 @@ public class Location extends Container {
 
     public String toString() {
 
-        return super.toString() + "\n\n" +
-                "CHARACTERS:\n" +
-                entitiesToString(characters) + "\n" +
-                "ARTEFACTS:\n" +
-                entitiesToString(artefacts) + "\n" +
-                "FURNITURE:\n" +
-                entitiesToString(furniture) + "\n" +
-                "PATHS:\n" +
-                pathsToString() + "\n";
+        return this.getName();
+
+//        return super.toString() + "\n\n" +
+//                "CHARACTERS:\n" +
+//                entitiesToString(characters) + "\n" +
+//                "ARTEFACTS:\n" +
+//                entitiesToString(artefacts) + "\n" +
+//                "FURNITURE:\n" +
+//                entitiesToString(furniture) + "\n" +
+//                "PATHS:\n" +
+//                pathsToString() + "\n";
     }
 }

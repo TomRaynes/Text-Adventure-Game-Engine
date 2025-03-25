@@ -21,8 +21,8 @@ public class InventoryAction extends BasicAction {
         }
         StringBuilder sb = new StringBuilder("Your inventory contains:\n");
 
-        for (Map.Entry<String, Artefact> entry : inventory) {
-            sb.append(entry.getValue().getDescription()).append("\n");
+        for (Artefact artefact : inventory) {
+            sb.append(artefact.getDescription()).append("\n");
         }
         String str = sb.toString();
         return str.substring(0, str.length() - 1);

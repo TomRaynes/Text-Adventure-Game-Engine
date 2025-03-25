@@ -64,6 +64,10 @@ public class GameState {
         return null;
     }
 
+    public GamePlayers getPlayers() {
+        return players;
+    }
+
     public Map<String, Set<GameAction>> getActions() {
         return actions;
     }

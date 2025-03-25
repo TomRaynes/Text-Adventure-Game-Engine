@@ -25,6 +25,7 @@ public class CustomAction extends GameAction {
     public CustomAction(Map<String, Location> locations, Element action) {
         this.locations = locations;
         this.action = action;
+        this.healthEffect = 0;
         subjects = this.getEntities(this.getElement("subjects"));
         consumed = this.getEntities(this.getElement("consumed"));
         produced = this.getEntities(this.getElement("produced"));
@@ -48,7 +49,7 @@ public class CustomAction extends GameAction {
 
     private void produceEntities(Location location) throws Exception {
 
-        for (GameEntity entity : produced.toSet()) {
+        for (GameEntity entity : produced) {
 
             if (entity instanceof Location path) {
                 location.addEntity(path);
@@ -65,7 +66,7 @@ public class CustomAction extends GameAction {
         Location location = player.getLocation();
         Inventory inventory = player.getInventory();
 
-        for (GameEntity entity : consumed.toSet()) {
+        for (GameEntity entity : consumed) {
 
             if (entity instanceof Location path) {
                 location.removeEntity(path);
@@ -85,15 +86,15 @@ public class CustomAction extends GameAction {
 
         Location location = player.getLocation();
         Inventory inventory = player.getInventory();
-        Set<GameEntity> entities = subjects.toSet(); // subject entities of action
-        entities.addAll(consumed.toSet());
+        EntityList entities = new EntityList(subjects, consumed);
+//        Set<GameEntity> entities = subjects.toSet(); // subject entities of action
+//        entities.addAll(consumed.toSet());
 
         for (GameEntity entity : entities) {
 
-            if (location.contains(entity) || inventory.contains(entity)) {
+            if (location.containsEntity(entity) || inventory.containsEntity(entity)) {
                 continue;
             }
-            System.out.println(entity.getName());
             throw new Exception(); // entity is not in inventory or current location
         }
     }
@@ -106,7 +107,7 @@ public class CustomAction extends GameAction {
 
         Set<GameEntity> extraneousEntities = new HashSet<>();
 
-        for (GameEntity entity : entities.toSet()) {
+        for (GameEntity entity : entities) {
 
             if (!subjects.containsEntity(entity)) {
                 extraneousEntities.add(entity);
@@ -128,7 +129,6 @@ public class CustomAction extends GameAction {
                 this.setHealthEffect(element.getTagName());
                 continue;
             }
-            else healthEffect = 0;
 
             GameEntity entity = GameState.getEntityFromLocations(entityNode.getTextContent(), locations);
             if (entity != null) entities.addEntity(entity);
@@ -143,9 +143,9 @@ public class CustomAction extends GameAction {
     private void setHealthEffect(String elementType) {
 
         if (Objects.equals(elementType, "produced")) {
-            healthEffect = 1;
+            healthEffect++;
         }
-        else healthEffect = -1;
+        else healthEffect--;
     }
 
     private Element getElement(String elementType) {
