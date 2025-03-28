@@ -96,5 +96,6 @@ final class ActionsFileTests {
         assertEquals(actionString, chop.toString());
         assertEquals(actionString, cut.toString());
         assertEquals(actionString, cutdown.toString());
+
     }
 }
