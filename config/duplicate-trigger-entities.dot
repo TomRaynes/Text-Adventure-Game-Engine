@@ -1,0 +1,34 @@
+digraph layout {
+    /* ortho splines just makes the arrows into straight lines (rather than curvy ones !) */
+    splines = ortho;
+    node [shape = "rect"];
+
+    subgraph locations {
+
+        subgraph cluster999 {
+            node [shape = "none"];
+            storeroom [description = "Storage for any entities not placed in the game"]
+            subgraph characters {
+                node [shape = "ellipse"];
+            }
+            subgraph artefacts {
+                node [shape = "diamond"];
+                key [description = "A key"];
+                housekey [description = "A housekey"];
+            }
+            subgraph furniture {
+                node [shape = "hexagon"];
+                door [description = "A door"];
+                trapdoor [description = "A trapdoor"];
+                key [description = "A key"];
+                house [description = "A house"];
+                cellar [description = "A cellar"];
+            }
+        }
+    }
+
+    subgraph paths {
+        storeroom -> storeroom
+    }
+
+}

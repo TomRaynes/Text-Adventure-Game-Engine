@@ -167,6 +167,7 @@ public class GameState {
             parser.parse(reader);
         }
         catch (Exception e) {
+            e.printStackTrace();
             throw new STAGException.EntitiesFileParseException();
         }
         Graph wholeDocument = parser.getGraphs().get(0);

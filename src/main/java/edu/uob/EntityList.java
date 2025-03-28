@@ -51,6 +51,8 @@ public class EntityList implements Iterable<GameEntity> {
     @Override
     public String toString() {
 
+        if (this.isEmpty()) return "";
+
         StringBuilder sb = new StringBuilder();
 
         for (GameEntity entity : entities) {

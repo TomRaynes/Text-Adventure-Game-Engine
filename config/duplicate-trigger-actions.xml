@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+    <action>
+        <triggers>
+            <keyphrase>open</keyphrase>
+            <keyphrase>unlock</keyphrase>
+        </triggers>
+        <subjects>
+            <entity>trapdoor</entity>
+            <entity>key</entity>
+        </subjects>
+        <consumed>
+            <entity>key</entity>
+        </consumed>
+        <produced>
+            <entity>cellar</entity>
+        </produced>
+        <narration>You unlock the trapdoor and see steps leading down into a cellar</narration>
+    </action>
+
+    <action>
+        <triggers>
+            <keyphrase>open</keyphrase>
+            <keyphrase>unlock</keyphrase>
+        </triggers>
+        <subjects>
+            <entity>door</entity>
+            <entity>housekey</entity>
+        </subjects>
+        <consumed>
+            <entity>housekey</entity>
+        </consumed>
+        <produced>
+            <entity>house</entity>
+            <entity>health</entity>
+            <entity>health</entity>
+        </produced>
+        <narration>You unlock the door to the house</narration>
+    </action>
+
+</actions>
