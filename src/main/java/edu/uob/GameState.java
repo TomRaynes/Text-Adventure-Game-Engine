@@ -4,10 +4,8 @@ import com.alexmerz.graphviz.Parser;
 import com.alexmerz.graphviz.objects.Edge;
 import com.alexmerz.graphviz.objects.Graph;
 import edu.uob.action.*;
-import edu.uob.entity.Container;
 import edu.uob.entity.GameEntity;
 import edu.uob.entity.Location;
-import edu.uob.entity.ObjectEntity;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -21,10 +19,10 @@ import java.util.*;
 
 public class GameState {
 
-    Map<String, Set<GameAction>> actions;
-    Map<String, Location> locations;
-    Location startLocation;
-    GamePlayers players;
+    private Map<String, Set<GameAction>> actions;
+    private Map<String, Location> locations;
+    private Location startLocation;
+    private GamePlayers players;
 
     public GameState(File actionsFile, File entitiesFile) throws Exception {
         locations = new HashMap<>();
@@ -34,14 +32,25 @@ public class GameState {
         players = new GamePlayers(startLocation);
     }
 
+    // ----- Methods for testing only ----- //
+    public Map<String, Location> getLocations() {
+        return locations;
+    }
+
+    public Location getStartLocation() {
+        return startLocation;
+    }
+
+    // ------------------------------------ //
+
     public String handleCommand(String input) throws Exception {
         Player player = players.getPlayer(input.substring(0, input.indexOf(':')));
-        String command = input.substring(input.indexOf(':') + 1);
+        int index = input.indexOf(':') + 1;
+        String command = input.substring(index);
         Tokeniser tokeniser = new Tokeniser(this, locations, player, command);
         EntityList entities = tokeniser.getEntities();
         GameAction action = tokeniser.getAction(entities);
-        StringBuilder sb = new StringBuilder(action.performAction(player, entities));
-        return sb.append("\n").toString();
+        return GameServer.joinStrings(action.performAction(player, entities), "\n");
     }
 
     public static GameEntity getEntityFromLocations(String entityName,
@@ -94,8 +103,16 @@ public class GameState {
 
     private Map<String, Set<GameAction>> getCustomActions(File actionsFile) throws Exception {
 
-        DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        Document document = builder.parse(actionsFile);
+        DocumentBuilder builder;
+        Document document;
+
+        try {
+            builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            document = builder.parse(actionsFile);
+        }
+        catch (Exception | Error e) {
+            throw new STAGException.ActionsFileParseException();
+        }
         Element root = document.getDocumentElement();
         NodeList actionNodes = root.getChildNodes();
         int index = 1;
@@ -103,19 +120,24 @@ public class GameState {
         Map<String, Set<GameAction>> actions = new HashMap<>();
 
         while ((action = (Element) actionNodes.item(index)) != null) {
+
+            if (!Objects.equals(action.getTagName(), "action")) {
+                throw new STAGException.MalformedActionsFileException();
+            }
             Element triggers = (Element) action.getElementsByTagName("triggers").item(0);
-            Set<String> keyPhrases = getKeyPhrases(triggers);
+            Set<String> keyPhrases = this.getKeyPhrases(triggers);
             CustomAction customAction = new CustomAction(locations, action);
 
             for (String keyPhrase : keyPhrases) {
+                String keyPhraseLowerCase = keyPhrase.toLowerCase();
 
-                if (actions.containsKey(keyPhrase)) {
-                    actions.get(keyPhrase).add(customAction);
+                if (actions.containsKey(keyPhraseLowerCase)) {
+                    actions.get(keyPhraseLowerCase).add(customAction);
                 }
                 else {
                     Set<GameAction> actionSet = new HashSet<>();
                     actionSet.add(customAction);
-                    actions.put(keyPhrase, actionSet);
+                    actions.put(keyPhraseLowerCase, actionSet);
                 }
             }
             index+=2;
@@ -138,20 +160,34 @@ public class GameState {
     private void getEntitiesFromFile(File entitiesFile) throws Exception {
 
         Parser parser = new Parser();
-        FileReader reader = new FileReader(entitiesFile);
-        parser.parse(reader);
+        FileReader reader;
+
+        try {
+            reader = new FileReader(entitiesFile);
+            parser.parse(reader);
+        }
+        catch (Exception e) {
+            throw new STAGException.EntitiesFileParseException();
+        }
         Graph wholeDocument = parser.getGraphs().get(0);
+        // get first sub-graph (start location)
         Graph startLocation = wholeDocument.getSubgraphs().get(0).getSubgraphs().get(0);
         this.startLocation = new Location(startLocation);
         this.startLocation.initialiseAllEntityLocations();
         locations.put(this.startLocation.getName(), this.startLocation);
         wholeDocument.getSubgraphs().get(0).getSubgraphs().remove(0);
 
+        // get remaining locations
         for (Graph graph : wholeDocument.getSubgraphs().get(0).getSubgraphs()) {
             Location location = new Location(graph);
             location.initialiseAllEntityLocations(); // set all entity locations to current location
             locations.put(location.getName(), location);
         }
+        // add storeroom to locations if it doesn't exist
+        if (!locations.containsKey("storeroom")) {
+            locations.put("storeroom", new Location("storeroom", null));
+        }
+        // get paths
         for (Edge edge : wholeDocument.getSubgraphs().get(1).getEdges()) {
             Location fromLocation = locations.get(edge.getSource().getNode().getId().getId());
             Location toLocation = locations.get(edge.getTarget().getNode().getId().getId());
@@ -167,7 +203,7 @@ public class GameState {
     }
 
     public void printStartLocation() {
-        System.out.println("Start = " + startLocation.getName());
+        System.out.println(GameServer.joinStrings("Start = ", startLocation.getName()));
     }
 
 //    public void printActions() {

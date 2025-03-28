@@ -8,11 +8,13 @@ import java.nio.file.Paths;
 public final class GameServer {
 
     GameState state;
-    private static final char END_OF_TRANSMISSION = 4;
+    private static final String END_OF_TRANSMISSION = "\u0004";
 
     public static void main(String[] args) throws IOException {
-        File entitiesFile = Paths.get("config" + File.separator + "story1-entities.dot").toAbsolutePath().toFile();
-        File actionsFile = Paths.get("config" + File.separator + "story1-actions.xml").toAbsolutePath().toFile();
+        String entities = GameServer.joinStrings("config", File.separator, "extended-entities.dot");
+        String actions = GameServer.joinStrings("config", File.separator, "extended-actions.xml");
+        File entitiesFile = Paths.get(entities).toAbsolutePath().toFile();
+        File actionsFile = Paths.get(actions).toAbsolutePath().toFile();
         GameServer server = new GameServer(entitiesFile, actionsFile);
         server.blockingListenOn(8888);
     }
@@ -25,14 +27,12 @@ public final class GameServer {
     * @param actionsFile The game configuration file containing all game actions to use in your game
     */
     public GameServer(File entitiesFile, File actionsFile) {
-        // TODO implement your server logic here
 
         try {
             state = new GameState(actionsFile, entitiesFile);
         }
         catch (Exception e) {
             System.out.println(e.getMessage());
-            e.printStackTrace();
         }
     }
 
@@ -43,14 +43,25 @@ public final class GameServer {
     * @param command The incoming command to be processed
     */
     public String handleCommand(String command) {
-        // TODO implement your server logic here
 
         try {
             return state.handleCommand(command);
-        } catch (Exception e) {
-            e.printStackTrace();
+        }
+        catch (STAGException e) {
+            return e.getMessage();
+        }
+        catch (Exception e) {
             return "ERROR\n";
         }
+    }
+
+    public static String joinStrings(String... strings) {
+        StringBuilder sb = new StringBuilder();
+
+        for (String str : strings) {
+            sb.append(str);
+        }
+        return sb.toString();
     }
 
     /**
@@ -62,10 +73,11 @@ public final class GameServer {
     */
     public void blockingListenOn(int portNumber) throws IOException {
         try (ServerSocket s = new ServerSocket(portNumber)) {
-            System.out.println("Server listening on port " + portNumber);
+            System.out.println(GameServer.joinStrings("Server listening on port ",
+                                                       Integer.toString(portNumber)));
             while (!Thread.interrupted()) {
                 try {
-                    blockingHandleConnection(s);
+                    this.blockingHandleConnection(s);
                 } catch (IOException e) {
                     System.out.println("Connection closed");
                 }
@@ -87,10 +99,10 @@ public final class GameServer {
             System.out.println("Connection established");
             String incomingCommand = reader.readLine();
             if(incomingCommand != null) {
-                System.out.println("Received message from " + incomingCommand);
-                String result = handleCommand(incomingCommand);
+                System.out.println(GameServer.joinStrings("Received message from ", incomingCommand));
+                String result = this.handleCommand(incomingCommand);
                 writer.write(result);
-                writer.write("\n" + END_OF_TRANSMISSION + "\n");
+                writer.write(GameServer.joinStrings("\n", END_OF_TRANSMISSION, "\n"));
                 writer.flush();
             }
         }

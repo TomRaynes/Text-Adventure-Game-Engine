@@ -1,23 +1,25 @@
 package edu.uob.entity;
 
-import edu.uob.Player;
+import edu.uob.GameServer;
+import edu.uob.STAGException;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class Inventory extends Container implements Iterable<Artefact> {
 
-    Map<String, Artefact> artefacts;
+    private Map<String, Artefact> artefacts;
 
     public Inventory(String name, String description) {
         super(name, description);
         artefacts = new HashMap<>();
     }
+    public Set<Artefact> getArtefactsSet() {
+        return new HashSet<>(artefacts.values());
+    }
 
-    public void moveEntity(Container toLocation, Container... fromLocations) throws Exception {
-        throw new Exception(); // cant move inventory
+    public void moveEntity(Container toLocation, Container fromLocation) throws Exception {
+        throw new STAGException.TryingToMoveContainerException(this);
     }
 
     public void addEntity(Artefact artefact) {
@@ -45,31 +47,47 @@ public class Inventory extends Container implements Iterable<Artefact> {
         return artefacts.values().iterator();
     }
 
+    @Override
     public void forEach(Consumer<? super Artefact> action) {
         artefacts.values().forEach(action);
     }
 
     public void addEntity(Character character) throws Exception {
-        throw new Exception(); // only artefacts can be added
+        throw new STAGException.IllegalMoveToInventoryException(character);
     }
 
     public void addEntity(Furniture furniture) throws Exception {
-        throw new Exception(); // only artefacts can be added
+        throw new STAGException.IllegalMoveToInventoryException(furniture);
     }
 
     public void addEntity(Location path) throws Exception {
-        throw new Exception(); // only artefacts can be added
+        throw new STAGException.IllegalMoveToInventoryException(path);
     }
 
     public void removeEntity(Character character) throws Exception {
-        throw new Exception(); // only artefacts can be removed
+        throw new STAGException.EntityNotInInventoryException(character);
     }
 
     public void removeEntity(Furniture furniture) throws Exception {
-        throw new Exception(); // only artefacts can be removed
+        throw new STAGException.EntityNotInInventoryException(furniture);
     }
 
     public void removeEntity(Location path) throws Exception {
-        throw new Exception(); // only artefacts can be removed
+        throw new STAGException.EntityNotInInventoryException(path);
+    }
+
+    @Override
+    public String toString() {
+
+        if (this.isEmpty()) {
+            return "";
+        }
+
+        String artefactList = "";
+
+        for (Artefact artefact : artefacts.values()) {
+            artefactList = GameServer.joinStrings(artefactList, artefact.getDescription(), "\n");
+        }
+        return artefactList.substring(0, artefactList.length() - 1);
     }
 }

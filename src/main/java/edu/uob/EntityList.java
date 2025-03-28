@@ -7,10 +7,10 @@ import java.util.function.Consumer;
 
 public class EntityList implements Iterable<GameEntity> {
 
-    Set<GameEntity> entities;
+    private Set<GameEntity> entities;
 
     public EntityList() {
-        entities = new HashSet<>();
+        entities = new TreeSet<>();
     }
 
     public EntityList(Set<GameEntity> entitySet) {
@@ -36,7 +36,7 @@ public class EntityList implements Iterable<GameEntity> {
     private void addEntities(EntityList entities) {
 
         for (GameEntity entity : entities) {
-            this.addEntity(entity);
+            this.entities.add(entity);
         }
     }
 
@@ -48,14 +48,16 @@ public class EntityList implements Iterable<GameEntity> {
         return entities.size();
     }
 
+    @Override
     public String toString() {
 
-        StringBuilder str = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
 
         for (GameEntity entity : entities) {
-            str.append(entity.getNameDescription()).append("\n");
+            sb.append(entity.getName()).append(", ");
         }
-        return str.toString();
+        String str = sb.toString();
+        return str.substring(0, str.length() - 2);
     }
 
     @Override

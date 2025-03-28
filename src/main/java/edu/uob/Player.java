@@ -5,7 +5,7 @@ import edu.uob.entity.GameEntity;
 import edu.uob.entity.Inventory;
 import edu.uob.entity.Location;
 
-import java.util.Map;
+import java.util.HashSet;
 
 public class Player {
 
@@ -17,7 +17,7 @@ public class Player {
 
     public Player(String name, Location startLocation) {
         this.name = name;
-        inventory = new Inventory(null, null);
+        inventory = new Inventory("Inventory", null);
         location = startLocation;
         this.startLocation = startLocation;
         health = 3;
@@ -35,18 +35,18 @@ public class Player {
         }
         if (health < 1) {
             health = 3;
-            return this.runDeathSequence();
+            return this.deathSequence();
         }
         return "";
     }
 
-    public int getHealth() {
-        return health;
+    public String getHealth() {
+        return Integer.toString(health);
     }
 
-    private String runDeathSequence() throws Exception {
+    private String deathSequence() throws Exception {
 
-        for (Artefact artefact : inventory) {
+        for (Artefact artefact : inventory.getArtefactsSet()) {
             artefact.moveEntity(location, inventory);
         }
         location = startLocation;
@@ -58,17 +58,22 @@ public class Player {
 
         if (entity instanceof Location toLocation) {
 
-            Location fromLocation = this.location;
+            Location fromLocation = location;
 
-            if (fromLocation.getPaths().containsKey(toLocation.getName())) {
-                this.location = toLocation;
+            if (fromLocation == toLocation) {
+                throw new STAGException.PlayerAlreadyInLocationException(location);
             }
-            else throw new Exception(); // no path to location
+            if (fromLocation.getPaths().containsKey(toLocation.getName())) {
+                location = toLocation;
+            }
+            // no path to location
+            else throw new STAGException.NoPathToLocationException(fromLocation, toLocation);
 
             fromLocation.removePlayer(this);
-            this.location.addPlayer(this);
+            location.addPlayer(this);
         }
-        else throw new Exception(); // entity is not a location
+        // entity is not a location
+        else throw new STAGException.EntityNotLocationException(entity);
     }
 
     public Location getLocation() {

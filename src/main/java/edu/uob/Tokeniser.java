@@ -4,7 +4,6 @@ import edu.uob.action.CustomAction;
 import edu.uob.action.GameAction;
 import edu.uob.entity.GameEntity;
 import edu.uob.entity.Location;
-import edu.uob.entity.ObjectEntity;
 
 import java.util.*;
 
@@ -41,13 +40,13 @@ public class Tokeniser {
             if (entity == null) { // entity may be artefact in player inventory
                 entity = player.getEntityFromInventory(entityName);
             }
-            if (entity == null && this.getEntityFromAllInventories(entityName) != null) {
-                throw new Exception(); // entity in another players inventory
+            if (entity == null && (entity = this.getEntityFromAllInventories(entityName)) != null) {
+                throw new STAGException.EntityInAnotherPlayersInventoryException(entity);
             }
             if (entity == null) continue; // token is not an entity
 
             if (!entitySet.add(entity)) { // entity is given more than once
-                throw new Exception();
+                throw new STAGException.DuplicateEntityInCommandException(entity);
             }
         }
         return new EntityList(entitySet);
@@ -59,10 +58,8 @@ public class Tokeniser {
 
         for (Player player : players) {
             GameEntity entity = player.getEntityFromInventory(entityName);
-            System.out.println(player.getName());
 
             if (entity != null) {
-                System.out.println(entity.getName());
                 return entity;
             }
         }
@@ -71,9 +68,11 @@ public class Tokeniser {
 
     public GameAction getAction(EntityList entities) throws Exception {
 
+        // holds all actions that use any key phrase present in command
         Set<GameAction> actions = new HashSet<>();
 
         for (String keyPhrase : tokens) {
+            // hold all actions that use specific key phrase
             Set<GameAction> actionSet = state.getAction(keyPhrase);
             if (actionSet == null) continue; // token is not key phrase
             GameAction action = null;
@@ -81,11 +80,12 @@ public class Tokeniser {
             // if action set size > 1, determine which is the relevant action from the subjects
             if (actionSet.size() > 1) {
                 action = this.getActionFromEntities(actionSet, entities);
+                if (action == null) continue; // cant match an action with entities
             }
-            if (action == null) continue; // cant match an action with entities
+            else action = actionSet.iterator().next();
 
             if (!actions.add(action)) { // key phrase is used more than once
-                throw new Exception();
+                throw new STAGException.DuplicateKeyPhraseInCommandException();
             }
         }
         if (actions.isEmpty()) { // keyPhrase may contain multiple words
@@ -93,10 +93,10 @@ public class Tokeniser {
             if (action != null) actions.add(action);
         }
         if (actions.isEmpty()) { // no action is specified
-            throw new Exception();
+            throw new STAGException.NoActionFoundException();
         }
         if (actions.size() > 1) { // ambiguous command, multiple key phrases
-            throw new Exception();
+            throw new STAGException.AmbiguousCommandException();
         }
         return actions.iterator().next();
     }
@@ -106,7 +106,7 @@ public class Tokeniser {
         GameAction intendedAction = null;
         int currentMatches = 0;
 
-        for (GameAction action : actions) { // assume actions with same trigger phrase are CustomActions
+        for (GameAction action : actions) { //TODO: assume actions with same trigger phrase are CustomActions?
             EntityList subjects = ((CustomAction) action).getSubjects();
             int matches = 0;
 
@@ -124,7 +124,7 @@ public class Tokeniser {
         return intendedAction;
     }
 
-    private GameAction getMultiWordAction(EntityList entities) throws Exception {
+    private GameAction getMultiWordAction(EntityList entities) {
 
         GameAction action = null;
 

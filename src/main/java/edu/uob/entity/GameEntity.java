@@ -1,8 +1,11 @@
 package edu.uob.entity;
 
+import edu.uob.GameServer;
+import edu.uob.STAGException;
+
 import java.lang.Character;
 
-public abstract class GameEntity {
+public abstract class GameEntity implements Comparable<GameEntity> {
 
     private final String name;
     private final String description;
@@ -13,22 +16,23 @@ public abstract class GameEntity {
         this.description = description;
     }
 
-    public abstract void moveEntity(Container toLocation, Container... fromLocations) throws Exception;
+    public abstract void moveEntity(Container toLocation, Container fromLocation) throws Exception;
 
-    protected Container getFromLocation(Container... fromLocations) throws Exception {
+    protected Container getFromLocation(GameEntity entity, Container fromLocation,
+                                                             Container toLocation) throws Exception {
 
-        Container fromLocation = null;
-
-        for (Container container : fromLocations) {
-
-            if (container == null) {
-                fromLocation = location;
-                break;
-            }
-            if (container == location) fromLocation = container;
+        if (toLocation.containsEntity(entity) && toLocation instanceof Inventory) {
+            throw new STAGException.EntityAlreadyInInventoryException(entity);
         }
         if (fromLocation == null) {
-            throw new Exception(); // Entity is in different location
+            fromLocation = location;
+        }
+        else if (fromLocation != location) {
+
+            if (fromLocation instanceof Location) {
+                throw new STAGException.EntityInDifferentLocationException(entity);
+            }
+            else throw new STAGException.EntityNotInInventoryException(entity);
         }
         return fromLocation;
     }
@@ -40,11 +44,6 @@ public abstract class GameEntity {
     public Container getContainer() {
         return location;
     }
-
-
-
-
-
 
     public String getName() {
         return name;
@@ -64,13 +63,17 @@ public abstract class GameEntity {
     }
 
     public String toString() {
-        // TODO: remove string concatenation
         StringBuilder sb = new StringBuilder();
         sb.append(name).append(": ").append(description);
         return sb.toString();
     }
 
+    @Override
+    public int compareTo(GameEntity entity) {
+        return name.compareTo(entity.getName());
+    }
+
     public String getNameDescription() {
-        return name + ": " + description;
+        return GameServer.joinStrings(name, "; ", description);
     }
 }

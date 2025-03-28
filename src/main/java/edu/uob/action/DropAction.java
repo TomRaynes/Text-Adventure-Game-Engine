@@ -1,6 +1,7 @@
 package edu.uob.action;
 
 import edu.uob.EntityList;
+import edu.uob.GameServer;
 import edu.uob.GameState;
 import edu.uob.Player;
 import edu.uob.entity.Artefact;
@@ -11,12 +12,9 @@ public class DropAction extends BasicAction {
 
     public String performAction(Player player, EntityList entities) throws Exception {
 
-        GameEntity entity = BasicAction.getSingularEntity(entities);
+        GameEntity entity = BasicAction.getSingularEntity(entities, "DROP");
         Inventory inventory = player.getInventory();
         entity.moveEntity(player.getLocation(), inventory);
-
-        StringBuilder sb = new StringBuilder(entity.getTitleCaseName());
-        sb.append(" dropped from inventory");
-        return sb.toString();
+        return GameServer.joinStrings(entity.getTitleCaseName(), " dropped from inventory");
     }
 }

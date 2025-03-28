@@ -1,8 +1,6 @@
 package edu.uob.action;
 
-import edu.uob.EntityList;
-import edu.uob.GameState;
-import edu.uob.Player;
+import edu.uob.*;
 import edu.uob.entity.*;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -14,7 +12,7 @@ import java.util.Set;
 
 public class CustomAction extends GameAction {
 
-    Map<String, Location> locations;
+    private final Map<String, Location> locations;
     private final Element action;
     private final EntityList subjects;
     private final EntityList consumed;
@@ -34,17 +32,16 @@ public class CustomAction extends GameAction {
 
     public String performAction(Player player, EntityList entities) throws Exception {
 
-        this.checkValidityOfEntities(entities);
         this.checkAvailabilityOfEntities(player);
+        this.checkValidityOfEntities(entities);
         this.consumeEntities(player);
         this.produceEntities(player.getLocation());
         String deathMessage = player.updateHealth(healthEffect);
-        StringBuilder sb = new StringBuilder(narration);
 
-        if (!deathMessage.isEmpty()) {
-            sb.append("\n\n").append(deathMessage);
+        if (deathMessage.isEmpty()) {
+            return narration;
         }
-        return sb.toString();
+        return GameServer.joinStrings(narration, "\n\n", deathMessage);
     }
 
     private void produceEntities(Location location) throws Exception {
@@ -54,27 +51,18 @@ public class CustomAction extends GameAction {
             if (entity instanceof Location path) {
                 location.addEntity(path);
             }
-            else {
-                ObjectEntity objectEntity = (ObjectEntity) entity;
-                objectEntity.moveEntity(location, (Container) null);
-            }
+            else entity.moveEntity(location, null);
         }
     }
 
     private void consumeEntities(Player player) throws Exception {
 
-        Location location = player.getLocation();
-        Inventory inventory = player.getInventory();
-
         for (GameEntity entity : consumed) {
 
             if (entity instanceof Location path) {
-                location.removeEntity(path);
+                player.getLocation().removeEntity(path);
             }
-            else {
-                ObjectEntity objectEntity = (ObjectEntity) entity;
-                objectEntity.moveEntity(this.getStoreroom(), location, inventory);
-            }
+            else entity.moveEntity(this.getStoreroom(), entity.getContainer());
         }
     }
 
@@ -87,22 +75,28 @@ public class CustomAction extends GameAction {
         Location location = player.getLocation();
         Inventory inventory = player.getInventory();
         EntityList entities = new EntityList(subjects, consumed);
-//        Set<GameEntity> entities = subjects.toSet(); // subject entities of action
-//        entities.addAll(consumed.toSet());
 
         for (GameEntity entity : entities) {
+            boolean containsNonArtefact = false;
 
             if (location.containsEntity(entity) || inventory.containsEntity(entity)) {
                 continue;
             }
-            throw new Exception(); // entity is not in inventory or current location
+            // entity is not in inventory or current location
+            if (!(entity instanceof Artefact)) {
+                containsNonArtefact = true;
+            }
+            if (containsNonArtefact) {
+                throw new STAGException.ActionInWrongLocationException();
+            }
+            throw new STAGException.UnavailableEntityException();
         }
     }
 
     private void checkValidityOfEntities(EntityList entities) throws Exception {
 
-        if (entities.isEmpty()) {
-            throw new Exception(); // action must contain at least one entity
+        if (entities.isEmpty()) {  // action must contain at least one entity
+            throw new STAGException.NoSpecifiedEntityException();
         }
 
         Set<GameEntity> extraneousEntities = new HashSet<>();
@@ -114,7 +108,7 @@ public class CustomAction extends GameAction {
             }
         }
         if (extraneousEntities.isEmpty()) return;
-        throw new Exception();
+        throw new STAGException.ExtraneousEntityException();
     }
 
     private EntityList getEntities(Element element) {
@@ -124,13 +118,13 @@ public class CustomAction extends GameAction {
         EntityList entities = new EntityList();
 
         while ((entityNode = element.getElementsByTagName("entity").item(index++)) != null) {
+            String entityName = entityNode.getTextContent().toLowerCase();
 
-            if (Objects.equals(entityNode.getTextContent(), "health")) {
+            if (Objects.equals(entityName, "health")) {
                 this.setHealthEffect(element.getTagName());
                 continue;
             }
-
-            GameEntity entity = GameState.getEntityFromLocations(entityNode.getTextContent(), locations);
+            GameEntity entity = GameState.getEntityFromLocations(entityName, locations);
             if (entity != null) entities.addEntity(entity);
         }
         return entities;
@@ -142,7 +136,7 @@ public class CustomAction extends GameAction {
 
     private void setHealthEffect(String elementType) {
 
-        if (Objects.equals(elementType, "produced")) {
+        if (Objects.equals(elementType.toLowerCase(), "produced")) {
             healthEffect++;
         }
         else healthEffect--;
@@ -154,14 +148,12 @@ public class CustomAction extends GameAction {
 
     public String toString() {
 
-        StringBuilder str = new StringBuilder();
-
-        str.append("\nSUBJECTS:\n").append(subjects.toString()).append("CONSUMED:\n")
-                .append(consumed.toString()).append("PRODUCED:\n").append(produced.toString()).append("\n");
-
-        str.append("NARRATION: ").append(narration).append("\nHEALTH: ").append(healthEffect)
-                .append("\n_________________\n");
-
-        return str.toString();
+        StringBuilder sb = new StringBuilder();
+        sb.append("SUBJECTS: ").append(subjects.toString());
+        sb.append("\nCONSUMED: ").append(consumed.toString());
+        sb.append("\nPRODUCED: ").append(produced.toString());
+        sb.append("\nNARRATION: ").append(narration);
+        sb.append("\nHEALTH: ").append(healthEffect);
+        return sb.toString();
     }
 }

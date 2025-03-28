@@ -1,25 +1,25 @@
 package edu.uob.action;
 
 import edu.uob.EntityList;
+import edu.uob.GameServer;
 import edu.uob.Player;
+import edu.uob.STAGException;
 import edu.uob.entity.Location;
 
 public class LookAction extends BasicAction {
 
     public String performAction(Player player, EntityList entities) throws Exception {
 
-        if (!entities.isEmpty()) { // inventory action has no subjects
-            throw new Exception();
+        if (!entities.isEmpty()) { // look action has no subjects
+            throw new STAGException.EntityInSubjectlessCommandException("LOOK");
         }
         Location location = player.getLocation();
-        StringBuilder sb = new StringBuilder("You are in ");
-        sb.append(location.getDescription().toLowerCase()).append(". ");
-
-        if (location.hasNoEntities()) {
-            sb.append("Nothing can be seen");
-            return sb.toString();
+        String description = GameServer.joinStrings("You are in ",
+                                                     location.getDescription().toLowerCase(), ". ");
+        if (location.isEmpty()) {
+            return GameServer.joinStrings(description, "Nothing can be seen");
         }
-        sb.append("You can see:\n").append(location.playersAndEntitiesToString(player));
-        return sb.toString();
+        return GameServer.joinStrings(description, "You can see:\n",
+                                                    location.playersAndEntitiesToString(player));
     }
 }
