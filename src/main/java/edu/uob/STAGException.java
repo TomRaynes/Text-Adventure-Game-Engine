@@ -136,8 +136,16 @@ public class STAGException extends Exception {
 
         @Serial private static final long serialVersionUID = 1;
 
-        public NoSpecifiedEntityException() {
-            super("No entity referenced in command");
+        public NoSpecifiedEntityException(String command) {
+            super(NoSpecifiedEntityException.getMessage(command));
+        }
+
+        private static String getMessage(String command) {
+
+            if (command == null) {
+                return "No entity referenced in command";
+            }
+            else return GameServer.joinStrings("No entity referenced in ", command, " command");
         }
     }
 

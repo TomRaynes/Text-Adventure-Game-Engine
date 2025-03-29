@@ -62,8 +62,9 @@ public class Location extends Container {
         StringBuilder sb = new StringBuilder();
         sb.append(this.entitiesTypeToString(entities));
         sb.append(this.entitiesTypeToString(paths));
+        Set<Player> orderedPlayers = new TreeSet<>(players.values());
 
-        for (Player player : players.values()) {
+        for (Player player : orderedPlayers) {
             if (player == activePlayer) continue;
             sb.append(player.getName()).append(", a fellow adventurer\n");
         }
@@ -72,11 +73,12 @@ public class Location extends Container {
     }
 
     private <T extends GameEntity> String entitiesTypeToString(Map<String, T> entities) {
+        Set<GameEntity> orderedEntities = new TreeSet<>(entities.values());
 
         StringBuilder sb = new StringBuilder();
 
-        for (Map.Entry<String, T> entry : entities.entrySet()) {
-            sb.append(entry.getValue().getDescription()).append("\n");
+        for (GameEntity entity : orderedEntities) {
+            sb.append(entity.getDescription()).append("\n");
         }
         return sb.toString();
     }

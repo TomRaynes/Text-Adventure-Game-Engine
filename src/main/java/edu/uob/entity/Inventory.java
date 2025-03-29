@@ -44,7 +44,8 @@ public class Inventory extends Container implements Iterable<Artefact> {
 
     @Override
     public Iterator<Artefact> iterator() {
-        return artefacts.values().iterator();
+        Set<Artefact> orderedInventory = new TreeSet<>(artefacts.values());
+        return orderedInventory.iterator();
     }
 
     @Override

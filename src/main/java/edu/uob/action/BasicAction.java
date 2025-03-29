@@ -9,7 +9,7 @@ public abstract class BasicAction extends GameAction {
     protected static GameEntity getSingularEntity(EntityList entities, String command) throws Exception {
 
         if (entities.isEmpty()) { // no subject entity
-            throw new STAGException.NoSpecifiedEntityException();
+            throw new STAGException.NoSpecifiedEntityException(command);
         }
         if (entities.getSize() > 1) { // must contain only 1 subject entity
             throw new STAGException.MultipleEntitiesInBasicCommandException(command);

@@ -96,7 +96,7 @@ public class CustomAction extends GameAction {
     private void checkValidityOfEntities(EntityList entities) throws Exception {
 
         if (entities.isEmpty()) {  // action must contain at least one entity
-            throw new STAGException.NoSpecifiedEntityException();
+            throw new STAGException.NoSpecifiedEntityException(null);
         }
 
         Set<GameEntity> extraneousEntities = new HashSet<>();

@@ -7,7 +7,7 @@ import edu.uob.entity.Location;
 
 import java.util.HashSet;
 
-public class Player {
+public class Player implements Comparable<Player> {
 
     private final String name;
     private Inventory inventory;
@@ -95,5 +95,10 @@ public class Player {
     @Override
     public String toString() {
         return name;
+    }
+
+    @Override
+    public int compareTo(Player player) {
+        return name.compareTo(player.getName());
     }
 }

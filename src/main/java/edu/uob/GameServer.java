@@ -43,16 +43,7 @@ public final class GameServer {
     * @param command The incoming command to be processed
     */
     public String handleCommand(String command) {
-
-        try {
-            return state.handleCommand(command);
-        }
-        catch (STAGException e) {
-            return e.getMessage();
-        }
-        catch (Exception e) {
-            return "ERROR\n";
-        }
+        return state.handleCommand(command);
     }
 
     public static String joinStrings(String... strings) {

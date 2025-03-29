@@ -22,7 +22,7 @@ public final class GameClient {
     }
 
     private static void handleNextCommand(String username) throws IOException {
-        System.out.println(GameServer.joinStrings(username, ":> "));
+        System.out.print(GameServer.joinStrings(username, ":> "));
         BufferedReader commandLine = new BufferedReader(new InputStreamReader(System.in));
         String command = commandLine.readLine();
         try (var socket = new Socket("localhost", 8888);

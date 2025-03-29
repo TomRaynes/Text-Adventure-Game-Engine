@@ -43,14 +43,24 @@ public class GameState {
 
     // ------------------------------------ //
 
-    public String handleCommand(String input) throws Exception {
-        Player player = players.getPlayer(input.substring(0, input.indexOf(':')));
-        int index = input.indexOf(':') + 1;
-        String command = input.substring(index);
-        Tokeniser tokeniser = new Tokeniser(this, locations, player, command);
-        EntityList entities = tokeniser.getEntities();
-        GameAction action = tokeniser.getAction(entities);
-        return GameServer.joinStrings(action.performAction(player, entities), "\n");
+    public String handleCommand(String input) {
+
+        try {
+            Player player = players.getPlayer(input.substring(0, input.indexOf(':')));
+            int index = input.indexOf(':') + 1;
+            String command = input.substring(index);
+            Tokeniser tokeniser = new Tokeniser(this, locations, player, command);
+            EntityList entities = tokeniser.getEntities();
+            GameAction action = tokeniser.getAction(entities);
+            return GameServer.joinStrings(action.performAction(player, entities), "\n");
+        }
+        catch (STAGException e) {
+            return e.getMessage();
+        }
+        catch (Exception e) {
+            return "ERROR\n";
+        }
+
     }
 
     public static GameEntity getEntityFromLocations(String entityName,

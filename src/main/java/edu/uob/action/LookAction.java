@@ -17,7 +17,7 @@ public class LookAction extends BasicAction {
         String description = GameServer.joinStrings("You are in ",
                                                      location.getDescription().toLowerCase(), ". ");
         if (location.isEmpty()) {
-            return GameServer.joinStrings(description, "Nothing can be seen");
+            return GameServer.joinStrings(description, "Nothing can be seen.");
         }
         return GameServer.joinStrings(description, "You can see:\n",
                                                     location.playersAndEntitiesToString(player));
