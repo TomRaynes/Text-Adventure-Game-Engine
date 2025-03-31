@@ -180,40 +180,4 @@ public class Location extends Container {
         }
         return entities;
     }
-
-    private <T extends GameEntity> String entitiesToString(Map<String, T> entities) {
-        StringBuilder str = new StringBuilder();
-
-        for (GameEntity entity : entities.values()) {
-            str.append(entity.getName()).append("\n");
-        }
-        return str.toString();
-    }
-
-    private String pathsToString() {
-
-        if (paths.isEmpty()) return "Empty\n";
-
-        StringBuilder str = new StringBuilder();
-
-        for (Map.Entry<String, Location> location : paths.entrySet()) {
-            str.append(location.getValue().getName()).append("\n");
-        }
-        return str.toString();
-    }
-
-    public String toString() {
-
-        return this.getName();
-
-//        return super.toString() + "\n\n" +
-//                "CHARACTERS:\n" +
-//                entitiesToString(characters) + "\n" +
-//                "ARTEFACTS:\n" +
-//                entitiesToString(artefacts) + "\n" +
-//                "FURNITURE:\n" +
-//                entitiesToString(furniture) + "\n" +
-//                "PATHS:\n" +
-//                pathsToString() + "\n";
-    }
 }

@@ -29,6 +29,10 @@ public class EntityList implements Iterable<GameEntity> {
         entities.add(entity);
     }
 
+    public void removeEntity(GameEntity entity) {
+        entities.remove(entity);
+    }
+
     public boolean containsEntity(GameEntity entity) {
         return entities.contains(entity);
     }

@@ -7,7 +7,6 @@ import java.io.File;
 import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class BasicActionsTests {
 
@@ -15,8 +14,8 @@ public class BasicActionsTests {
 
     @BeforeEach
     public void initialiseState() throws Exception {
-        File actionsFile = Paths.get(GameServer.joinStrings("config", File.separator, "test-actions.xml")).toAbsolutePath().toFile();
-        File entitiesFile = Paths.get(GameServer.joinStrings("config", File.separator, "test-entities.dot")).toAbsolutePath().toFile();
+        File actionsFile = Paths.get(GameServer.joinStrings("config", File.separator, "testBasic-actions.xml")).toAbsolutePath().toFile();
+        File entitiesFile = Paths.get(GameServer.joinStrings("config", File.separator, "testBasic-entities.dot")).toAbsolutePath().toFile();
         state = new GameState(actionsFile, entitiesFile);
 
     }
@@ -222,6 +221,11 @@ public class BasicActionsTests {
         expected = "ERROR: Trapdoor cannot be added to inventory\n";
         assertEquals(expected, response);
 
+        // test get location
+        response = this.handleCommand("Roger", "get cabin");
+        expected = "ERROR: The cabin cannot be moved\n";
+        assertEquals(expected, response);
+
         // test get character
         this.handleCommand("Roger", "goto forest");
         this.handleCommand("Roger", "get key");
@@ -232,9 +236,15 @@ public class BasicActionsTests {
         expected = "ERROR: Elf cannot be added to inventory\n";
         assertEquals(expected, response);
 
-        // test other invalid get commands
+        // no referenced entity
         response = this.handleCommand("Roger", "get");
         expected = "ERROR: No entity referenced in GET command\n";
+        assertEquals(expected, response);
+
+        // entity in wrong location
+        this.handleCommand("Roger", "goto forest");
+        response = this.handleCommand("Roger", "get potion");
+        expected = "ERROR: Potion is in another location\n";
         assertEquals(expected, response);
     }
 
@@ -246,6 +256,11 @@ public class BasicActionsTests {
         assertEquals(expected, response);
 
         this.handleCommand("Roger", "get axe");
+        // duplicate entity
+        response = this.handleCommand("Roger", "drop axe axe");
+        expected = "ERROR: Axe was referenced more than once in command\n";
+        assertEquals(expected, response);
+
         response = this.handleCommand("Roger", "drop axe");
         expected = "Axe dropped from inventory\n";
         assertEquals(expected, response);
@@ -266,6 +281,11 @@ public class BasicActionsTests {
         //drop character (not in inventory)
         response = this.handleCommand("Roger", "drop elf");
         expected = "ERROR: Elf is not in your inventory\n";
+        assertEquals(expected, response);
+
+        //drop location (not in inventory)
+        response = this.handleCommand("Roger", "drop cabin");
+        expected = "ERROR: The cabin cannot be moved\n";
         assertEquals(expected, response);
     }
 
@@ -353,6 +373,21 @@ public class BasicActionsTests {
         // test goto two locations
         response = this.handleCommand("Roger", "goto cabin forest");
         expected = "ERROR: Multiple entities were referenced in GOTO command\n";
+        assertEquals(expected, response);
+        response = this.handleCommand("Roger", "look");
+        expected = """
+                   You are in a log cabin in the woods. You can see:
+                   A razor sharp axe
+                   Some medicine
+                   Magic potion
+                   Wooden trapdoor
+                   A dark forest
+                   """;
+        assertEquals(expected, response);
+
+        // test goto non location
+        response = this.handleCommand("Roger", "goto axe");
+        expected = "ERROR: Axe is not a location\n";
         assertEquals(expected, response);
         response = this.handleCommand("Roger", "look");
         expected = """

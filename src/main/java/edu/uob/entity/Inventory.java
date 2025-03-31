@@ -1,6 +1,5 @@
 package edu.uob.entity;
 
-import edu.uob.GameServer;
 import edu.uob.STAGException;
 
 import java.util.*;
@@ -75,20 +74,5 @@ public class Inventory extends Container implements Iterable<Artefact> {
 
     public void removeEntity(Location path) throws Exception {
         throw new STAGException.EntityNotInInventoryException(path);
-    }
-
-    @Override
-    public String toString() {
-
-        if (this.isEmpty()) {
-            return "";
-        }
-
-        String artefactList = "";
-
-        for (Artefact artefact : artefacts.values()) {
-            artefactList = GameServer.joinStrings(artefactList, artefact.getDescription(), "\n");
-        }
-        return artefactList.substring(0, artefactList.length() - 1);
     }
 }

@@ -14,7 +14,7 @@ public class GamePlayers implements Iterable<Player> {
     public GamePlayers(Location startLocation) {
         this.startLocation = startLocation;
         players = new HashMap<>();
-        legalChars = getLegalChars();
+        legalChars = this.getLegalChars();
     }
 
     public Player getPlayer(String name) throws Exception {

@@ -68,26 +68,8 @@ public class Tokeniser {
 
     public GameAction getAction(EntityList entities) throws Exception {
 
-        // holds all actions that use any key phrase present in command
-        Set<GameAction> actions = new HashSet<>();
+        Set<GameAction> actions = this.getMatchedActions(entities);
 
-        for (String keyPhrase : tokens) {
-            // hold all actions that use specific key phrase
-            Set<GameAction> actionSet = state.getAction(keyPhrase);
-            if (actionSet == null) continue; // token is not key phrase
-            GameAction action = null;
-
-            // if action set size > 1, determine which is the relevant action from the subjects
-            if (actionSet.size() > 1) {
-                action = this.getActionFromEntities(actionSet, entities);
-                if (action == null) continue; // cant match an action with entities
-            }
-            else action = actionSet.iterator().next();
-
-            if (!actions.add(action)) { // key phrase is used more than once
-                throw new STAGException.DuplicateKeyPhraseInCommandException();
-            }
-        }
         if (actions.isEmpty()) { // keyPhrase may contain multiple words
             GameAction action = this.getMultiWordAction(entities);
             if (action != null) actions.add(action);
@@ -101,12 +83,38 @@ public class Tokeniser {
         return actions.iterator().next();
     }
 
-    public GameAction getActionFromEntities(Set<GameAction> actions, EntityList entities) {
+    private Set<GameAction> getMatchedActions(EntityList entities) throws Exception {
 
-        GameAction intendedAction = null;
+        // holds all actions that use any key phrase present in command
+        Set<GameAction> matchedActions = new HashSet<>();
+
+        for (String keyPhrase : tokens) {
+            // hold all actions that use specific key phrase
+            Set<GameAction> actionSet = state.getAction(keyPhrase);
+            if (actionSet == null) continue; // token is not key phrase
+            GameAction action;
+
+            // if action set size > 1, determine which is the relevant action from the subjects
+            if (actionSet.size() > 1) {
+                action = this.getActionFromEntities(actionSet, entities);
+
+                if (action == null) continue; // cant match an action with entities
+            }
+            else action = actionSet.iterator().next();
+
+            if (!matchedActions.add(action)) { // key phrase is used more than once
+                throw new STAGException.DuplicateKeyPhraseInCommandException();
+            }
+        }
+        return matchedActions;
+    }
+
+    public GameAction getActionFromEntities(Set<GameAction> actions, EntityList entities)
+                                                                            throws Exception {
+        Set<GameAction> matchedActions = null;
         int currentMatches = 0;
 
-        for (GameAction action : actions) { //TODO: assume actions with same trigger phrase are CustomActions?
+        for (GameAction action : actions) {
             EntityList subjects = ((CustomAction) action).getSubjects();
             int matches = 0;
 
@@ -114,17 +122,24 @@ public class Tokeniser {
                 if (subjects.containsEntity(entity)) matches++;
             }
             if (matches > currentMatches) {
-                intendedAction = action;
+                matchedActions = new HashSet<>();
+                matchedActions.add(action);
                 currentMatches = matches;
             }
-            else if (matches == currentMatches) {
-                intendedAction = null;
+            else if (matchedActions != null && matches == currentMatches) {
+                matchedActions.add(action);
             }
         }
-        return intendedAction;
+        if (matchedActions == null) {
+            return null;
+        }
+        if (matchedActions.size() > 1) {
+            throw new STAGException.AmbiguousCommandException();
+        }
+        return matchedActions.iterator().next();
     }
 
-    private GameAction getMultiWordAction(EntityList entities) {
+    private GameAction getMultiWordAction(EntityList entities) throws Exception {
 
         GameAction action = null;
 

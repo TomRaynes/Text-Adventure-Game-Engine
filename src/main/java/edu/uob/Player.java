@@ -93,11 +93,6 @@ public class Player implements Comparable<Player> {
     }
 
     @Override
-    public String toString() {
-        return name;
-    }
-
-    @Override
     public int compareTo(Player player) {
         return name.compareTo(player.getName());
     }

@@ -62,18 +62,8 @@ public abstract class GameEntity implements Comparable<GameEntity> {
         return description;
     }
 
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(name).append(": ").append(description);
-        return sb.toString();
-    }
-
     @Override
     public int compareTo(GameEntity entity) {
         return name.compareTo(entity.getName());
-    }
-
-    public String getNameDescription() {
-        return GameServer.joinStrings(name, "; ", description);
     }
 }

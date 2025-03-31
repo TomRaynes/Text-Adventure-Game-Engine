@@ -205,23 +205,4 @@ public class GameState {
             fromLocation.addEntity(toLocation);
         }
     }
-
-    public void printLocations() {
-
-        for (Map.Entry<String, Location> location : locations.entrySet()) {
-            System.out.println(location.getValue());
-        }
-    }
-
-    public void printStartLocation() {
-        System.out.println(GameServer.joinStrings("Start = ", startLocation.getName()));
-    }
-
-//    public void printActions() {
-//
-//        for (Map.Entry<String, GameAction> action : actions.entrySet()) {
-//            System.out.println(action.getKey().toUpperCase());
-//            System.out.println(action.getValue().toString());
-//        }
-//    }
 }

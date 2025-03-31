@@ -75,8 +75,8 @@ final class ActionsFileTests {
         assertTrue(actions.containsKey("cutdown"));
         assertEquals(12, actions.size());
 
-        CustomAction open = getActionFromSet(actions.get("open"));
-        CustomAction unlock = getActionFromSet(actions.get("unlock"));
+        CustomAction open = this.getActionFromSet(actions.get("open"));
+        CustomAction unlock = this.getActionFromSet(actions.get("unlock"));
         String actionString = """
                               SUBJECTS: key, trapdoor
                               CONSUMED: key
@@ -86,9 +86,9 @@ final class ActionsFileTests {
         assertEquals(actionString, open.toString());
         assertEquals(actionString, unlock.toString());
 
-        CustomAction chop = getActionFromSet(actions.get("chop"));
-        CustomAction cut = getActionFromSet(actions.get("cut"));
-        CustomAction cutdown = getActionFromSet(actions.get("cutdown"));
+        CustomAction chop = this.getActionFromSet(actions.get("chop"));
+        CustomAction cut = this.getActionFromSet(actions.get("cut"));
+        CustomAction cutdown = this.getActionFromSet(actions.get("cutdown"));
         actionString = """
                               SUBJECTS: axe, tree
                               CONSUMED: tree
@@ -129,8 +129,8 @@ final class ActionsFileTests {
         assertTrue(actions.containsKey("blow"));
         assertEquals(20, actions.size());
 
-        CustomAction open = getActionFromSet(actions.get("open"));
-        CustomAction unlock = getActionFromSet(actions.get("unlock"));
+        CustomAction open = this.getActionFromSet(actions.get("open"));
+        CustomAction unlock = this.getActionFromSet(actions.get("unlock"));
         String actionString = """
                               SUBJECTS: key, trapdoor
                               CONSUMED: key
@@ -140,9 +140,9 @@ final class ActionsFileTests {
         assertEquals(actionString, open.toString());
         assertEquals(actionString, unlock.toString());
 
-        CustomAction chop = getActionFromSet(actions.get("chop"));
-        CustomAction cut = getActionFromSet(actions.get("cut"));
-        CustomAction cutDown = getActionFromSet(actions.get("cut down"));
+        CustomAction chop = this.getActionFromSet(actions.get("chop"));
+        CustomAction cut = this.getActionFromSet(actions.get("cut"));
+        CustomAction cutDown = this.getActionFromSet(actions.get("cut down"));
         actionString = """
                               SUBJECTS: axe, tree
                               CONSUMED: tree
@@ -153,7 +153,7 @@ final class ActionsFileTests {
         assertEquals(actionString, cut.toString());
         assertEquals(actionString, cutDown.toString());
 
-        CustomAction drink = getActionFromSet(actions.get("drink"));
+        CustomAction drink = this.getActionFromSet(actions.get("drink"));
         actionString = """
                               SUBJECTS: potion
                               CONSUMED: potion
@@ -162,9 +162,9 @@ final class ActionsFileTests {
                               HEALTH: 1""";
         assertEquals(actionString, drink.toString());
 
-        CustomAction fight = getActionFromSet(actions.get("fight"));
-        CustomAction hit = getActionFromSet(actions.get("hit"));
-        CustomAction attack = getActionFromSet(actions.get("attack"));
+        CustomAction fight = this.getActionFromSet(actions.get("fight"));
+        CustomAction hit = this.getActionFromSet(actions.get("hit"));
+        CustomAction attack = this.getActionFromSet(actions.get("attack"));
         actionString = """
                               SUBJECTS: elf
                               CONSUMED:\s
@@ -175,7 +175,7 @@ final class ActionsFileTests {
         assertEquals(actionString, hit.toString());
         assertEquals(actionString, attack.toString());
 
-        CustomAction pay = getActionFromSet(actions.get("pay"));
+        CustomAction pay = this.getActionFromSet(actions.get("pay"));
         actionString = """
                               SUBJECTS: coin, elf
                               CONSUMED: coin
@@ -184,7 +184,7 @@ final class ActionsFileTests {
                               HEALTH: 0""";
         assertEquals(actionString, pay.toString());
 
-        CustomAction bridge = getActionFromSet(actions.get("bridge"));
+        CustomAction bridge = this.getActionFromSet(actions.get("bridge"));
         actionString = """
                               SUBJECTS: log, river
                               CONSUMED: log
@@ -193,7 +193,7 @@ final class ActionsFileTests {
                               HEALTH: 0""";
         assertEquals(actionString, bridge.toString());
 
-        CustomAction dig = getActionFromSet(actions.get("dig"));
+        CustomAction dig = this.getActionFromSet(actions.get("dig"));
         actionString = """
                               SUBJECTS: ground, shovel
                               CONSUMED: ground
@@ -202,7 +202,7 @@ final class ActionsFileTests {
                               HEALTH: 0""";
         assertEquals(actionString, dig.toString());
 
-        CustomAction blow = getActionFromSet(actions.get("blow"));
+        CustomAction blow = this.getActionFromSet(actions.get("blow"));
         actionString = """
                               SUBJECTS: horn
                               CONSUMED:\s

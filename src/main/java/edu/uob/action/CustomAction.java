@@ -76,17 +76,21 @@ public class CustomAction extends GameAction {
         Inventory inventory = player.getInventory();
         EntityList entities = new EntityList(subjects, consumed);
 
+        // locations will never be in current location or inventory
         for (GameEntity entity : entities) {
-            boolean containsNonArtefact = false;
+
+            if (entity instanceof Location) {
+                entities.removeEntity(entity);
+            }
+        }
+
+        for (GameEntity entity : entities) {
 
             if (location.containsEntity(entity) || inventory.containsEntity(entity)) {
                 continue;
             }
             // entity is not in inventory or current location
             if (!(entity instanceof Artefact)) {
-                containsNonArtefact = true;
-            }
-            if (containsNonArtefact) {
                 throw new STAGException.ActionInWrongLocationException();
             }
             throw new STAGException.UnavailableEntityException();
@@ -98,17 +102,14 @@ public class CustomAction extends GameAction {
         if (entities.isEmpty()) {  // action must contain at least one entity
             throw new STAGException.NoSpecifiedEntityException(null);
         }
-
-        Set<GameEntity> extraneousEntities = new HashSet<>();
+        EntityList actionEntities = new EntityList(subjects, consumed, produced);
 
         for (GameEntity entity : entities) {
 
-            if (!subjects.containsEntity(entity)) {
-                extraneousEntities.add(entity);
+            if (!actionEntities.containsEntity(entity)) {
+                throw new STAGException.ExtraneousEntityException();
             }
         }
-        if (extraneousEntities.isEmpty()) return;
-        throw new STAGException.ExtraneousEntityException();
     }
 
     private EntityList getEntities(Element element) {
