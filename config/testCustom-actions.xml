@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+    <action>
+        <triggers>
+            <keyphrase>open</keyphrase>
+            <keyphrase>unlock</keyphrase>
+        </triggers>
+        <subjects>
+            <entity>trapdoor</entity>
+            <entity>key</entity>
+        </subjects>
+        <consumed>
+            <entity>key</entity>
+        </consumed>
+        <produced>
+            <entity>cellar</entity>
+        </produced>
+        <narration>You unlock the trapdoor and see steps leading down into a cellar</narration>
+    </action>
+
+    <action>
+        <triggers>
+            <keyphrase>chop</keyphrase>
+            <keyphrase>cut down</keyphrase>
+        </triggers>
+        <subjects>
+            <entity>tree</entity>
+            <entity>axe</entity>
+        </subjects>
+        <consumed>
+            <entity>tree</entity>
+        </consumed>
+        <produced>
+            <entity>log</entity>
+        </produced>
+        <narration>You cut down the tree with the axe</narration>
+    </action>
+
+    <action>
+        <triggers>
+            <keyphrase>hit</keyphrase>
+        </triggers>
+        <subjects>
+            <entity>elf</entity>
+        </subjects>
+        <consumed>
+            <entity>health</entity>
+        </consumed>
+        <produced>
+        </produced>
+        <narration>You attack the elf, but he fights back and you lose some health</narration>
+    </action>
+
+    <action>
+        <triggers>
+            <keyphrase>fight</keyphrase>
+        </triggers>
+        <subjects>
+            <entity>elf</entity>
+        </subjects>
+        <consumed>
+            <entity>health</entity>
+            <entity>health</entity>
+        </consumed>
+        <produced>
+        </produced>
+        <narration>You attack the elf, but he fights back and you lose some health</narration>
+    </action>
+
+    <action>
+        <triggers>
+            <keyphrase>drink</keyphrase>
+        </triggers>
+        <subjects>
+            <entity>potion</entity>
+        </subjects>
+        <consumed>
+        </consumed>
+        <produced>
+            <entity>health</entity>
+        </produced>
+        <narration>You drink the potion and your health improves</narration>
+    </action>
+
+    <action>
+        <triggers>
+            <keyphrase>take</keyphrase>
+        </triggers>
+        <subjects>
+            <entity>medicine</entity>
+        </subjects>
+        <consumed>
+        </consumed>
+        <produced>
+            <entity>health</entity>
+            <entity>health</entity>
+        </produced>
+        <narration>You take the medicine and your health improves</narration>
+    </action>
+
+    <action>
+        <triggers>
+            <keyphrase>blow</keyphrase>
+        </triggers>
+        <subjects>
+            <entity>horn</entity>
+        </subjects>
+        <consumed>
+        </consumed>
+        <produced>
+            <entity>lumberjack</entity>
+        </produced>
+        <narration>You blow the horn and as if by magic, a lumberjack appears !</narration>
+    </action>
+
+    <action>
+        <triggers>
+            <keyphrase>build</keyphrase>
+        </triggers>
+        <subjects>
+            <entity>log</entity>
+        </subjects>
+        <consumed>
+        </consumed>
+        <produced>
+            <entity>table</entity>
+        </produced>
+        <narration>You build a table with the log</narration>
+    </action>
+
+    <action>
+        <triggers>
+            <keyphrase>move</keyphrase>
+        </triggers>
+        <subjects>
+            <entity>table</entity>
+        </subjects>
+        <consumed>
+            <entity>table</entity>
+        </consumed>
+        <produced>
+        </produced>
+        <narration>Table moved to storeroom</narration>
+    </action>
+
+    <action>
+        <triggers>
+            <keyphrase>move</keyphrase>
+        </triggers>
+        <subjects>
+            <entity>lumberjack</entity>
+        </subjects>
+        <consumed>
+            <entity>lumberjack</entity>
+        </consumed>
+        <produced>
+        </produced>
+        <narration>Lumberjack moved to storeroom</narration>
+    </action>
+
+    <action>
+        <triggers>
+            <keyphrase>move</keyphrase>
+        </triggers>
+        <subjects>
+            <entity>log</entity>
+        </subjects>
+        <consumed>
+            <entity>log</entity>
+        </consumed>
+        <produced>
+        </produced>
+        <narration>Log moved to storeroom</narration>
+    </action>
+
+    <action>
+        <triggers>
+            <keyphrase>move</keyphrase>
+        </triggers>
+        <subjects>
+            <entity>stick</entity>
+        </subjects>
+        <consumed>
+            <entity>stick</entity>
+        </consumed>
+        <produced>
+        </produced>
+        <narration>Stick moved to storeroom</narration>
+    </action>
+
+    <action>
+        <triggers>
+            <keyphrase>remove</keyphrase>
+        </triggers>
+        <subjects>
+            <entity>cabin</entity>
+        </subjects>
+        <consumed>
+            <entity>cabin</entity>
+        </consumed>
+        <produced>
+        </produced>
+        <narration>Path to cabin removed</narration>
+    </action>
+
+    <action>
+        <triggers>
+            <keyphrase>add</keyphrase>
+        </triggers>
+        <subjects>
+            <entity>cabin</entity>
+        </subjects>
+        <consumed>
+        </consumed>
+        <produced>
+            <entity>cabin</entity>
+        </produced>
+        <narration>Path to cabin added</narration>
+    </action>
+
+    <action>
+        <triggers>
+            <keyphrase>chip</keyphrase>
+        </triggers>
+        <subjects>
+            <entity>log</entity>
+        </subjects>
+        <consumed>
+        </consumed>
+        <produced>
+            <entity>stick</entity>
+        </produced>
+        <narration>You chip the log and get a stick</narration>
+    </action>
+
+    <action>
+        <triggers>
+            <keyphrase>break</keyphrase>
+        </triggers>
+        <subjects>
+            <entity>horn</entity>
+            <entity>axe</entity>
+        </subjects>
+        <consumed>
+            <entity>horn</entity>
+        </consumed>
+        <produced>
+        </produced>
+        <narration>You break the horn with the axe</narration>
+    </action>
+
+    <action>
+        <triggers>
+            <keyphrase>break</keyphrase>
+        </triggers>
+        <subjects>
+            <entity>key</entity>
+            <entity>axe</entity>
+        </subjects>
+        <consumed>
+            <entity>key</entity>
+        </consumed>
+        <produced>
+        </produced>
+        <narration>You break the key with the axe</narration>
+    </action>
+
+</actions>
