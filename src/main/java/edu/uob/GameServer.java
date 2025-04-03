@@ -32,7 +32,7 @@ public final class GameServer {
             state = new GameState(actionsFile, entitiesFile);
         }
         catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: An error occurred while initialising game state");
         }
     }
 
