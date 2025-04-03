@@ -1,6 +1,5 @@
 package edu.uob.entity;
 
-import edu.uob.GameServer;
 import edu.uob.STAGException;
 
 import java.lang.Character;

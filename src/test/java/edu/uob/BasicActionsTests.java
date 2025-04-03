@@ -108,10 +108,14 @@ public class BasicActionsTests {
         response = this.handleCommand("Roger", "look around");
         assertEquals(expected, response);
 
-        response = this.handleCommand("Roger", "What can I see when I look around?");
+        response = this.handleCommand("Roger", "look around the room");
         assertEquals(expected, response);
 
         // test invalid commands
+        response = this.handleCommand("Roger", "What can I see when I look around?");
+        expected = "ERROR: Incorrect order of tokens in command\n";
+        assertEquals(expected, response);
+
         response = this.handleCommand("Roger", "look around the cellar");
         expected = "ERROR: An entity was referenced in LOOK command\n";
         assertEquals(expected, response);
@@ -158,12 +162,17 @@ public class BasicActionsTests {
         assertEquals(expected, response);
 
         // test decorated command
-        response = this.handleCommand("Roger", "show my inventory");
+        response = this.handleCommand("Roger", "inventory show");
         expected = """
                    Your inventory contains:
                    A razor sharp axe
                    Magic potion
                    """;
+        assertEquals(expected, response);
+
+        // incorrect ordering
+        response = this.handleCommand("Roger", "show my inventory");
+        expected = "ERROR: Incorrect order of tokens in command\n";
         assertEquals(expected, response);
 
         // invalid command
@@ -491,16 +500,20 @@ public class BasicActionsTests {
         assertEquals(expected, response);
 
         // test decorated health command
-        response = this.handleCommand("Roger", "What is my health level?");
+        response = this.handleCommand("Roger", "health level?");
         expected = "Your health level is 3\n";
         assertEquals(expected, response);
 
         // test invalid command
+        response = this.handleCommand("Roger", "What is my health level?");
+        expected = "ERROR: Incorrect order of tokens in command\n";
+        assertEquals(expected, response);
+
         response = this.handleCommand("Roger", "get health");
         expected = "ERROR: Ambiguous command could be matched to multiple actions\n";
         assertEquals(expected, response);
 
-        response = this.handleCommand("Roger", "elf health");
+        response = this.handleCommand("Roger", "health of elf");
         expected = "ERROR: An entity was referenced in HEALTH command\n";
         assertEquals(expected, response);
     }

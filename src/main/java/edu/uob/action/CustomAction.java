@@ -19,6 +19,7 @@ public class CustomAction extends GameAction {
     private final EntityList produced;
     private final String narration;
     private int healthEffect;
+    private String keyPhrase;
 
     public CustomAction(Map<String, Location> locations, Element action) {
         this.locations = locations;
@@ -45,24 +46,24 @@ public class CustomAction extends GameAction {
     }
 
     private void produceEntities(Location location) throws Exception {
-
         for (GameEntity entity : produced) {
-
             if (entity instanceof Location path) {
                 location.addEntity(path);
             }
-            else entity.moveEntity(location, null);
+            else {
+                entity.moveEntity(location, null);
+            }
         }
     }
 
     private void consumeEntities(Player player) throws Exception {
-
         for (GameEntity entity : consumed) {
-
             if (entity instanceof Location path) {
                 player.getLocation().removeEntity(path);
             }
-            else entity.moveEntity(this.getStoreroom(), entity.getContainer());
+            else {
+                entity.moveEntity(this.getStoreroom(), entity.getContainer());
+            }
         }
     }
 
@@ -83,7 +84,6 @@ public class CustomAction extends GameAction {
                 entities.removeEntity(entity);
             }
         }
-
         for (GameEntity entity : entities) {
 
             if (location.containsEntity(entity) || inventory.containsEntity(entity)) {
@@ -95,6 +95,11 @@ public class CustomAction extends GameAction {
             }
             throw new STAGException.UnavailableEntityException();
         }
+        // if produced entity is in another players inventory
+        if (produced.containsEntityInForeignInventory(inventory)) {
+            throw new STAGException.ProducedEntityInForeignInventoryException();
+        }
+
     }
 
     private void checkValidityOfEntities(EntityList entities) throws Exception {
@@ -102,11 +107,10 @@ public class CustomAction extends GameAction {
         if (entities.isEmpty()) {  // action must contain at least one entity
             throw new STAGException.NoSpecifiedEntityException(null);
         }
-        EntityList actionEntities = new EntityList(subjects, consumed, produced);
 
         for (GameEntity entity : entities) {
 
-            if (!actionEntities.containsEntity(entity)) {
+            if (!subjects.containsEntity(entity)) {
                 throw new STAGException.ExtraneousEntityException();
             }
         }

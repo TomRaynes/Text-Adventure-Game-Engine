@@ -19,10 +19,10 @@ import java.util.*;
 
 public class GameState {
 
-    private Map<String, Set<GameAction>> actions;
-    private Map<String, Location> locations;
+    private final Map<String, Set<GameAction>> actions;
+    private final Map<String, Location> locations;
     private Location startLocation;
-    private GamePlayers players;
+    private final GamePlayers players;
 
     public GameState(File actionsFile, File entitiesFile) throws Exception {
         locations = new HashMap<>();
@@ -32,35 +32,32 @@ public class GameState {
         players = new GamePlayers(startLocation);
     }
 
-    // ----- Methods for testing only ----- //
-    public Map<String, Location> getLocations() {
-        return locations;
-    }
-
-    public Location getStartLocation() {
-        return startLocation;
-    }
-
-    // ------------------------------------ //
-
     public String handleCommand(String input) {
 
         try {
             Player player = players.getPlayer(input.substring(0, input.indexOf(':')));
             int index = input.indexOf(':') + 1;
             String command = input.substring(index);
-            Tokeniser tokeniser = new Tokeniser(this, locations, player, command);
-            EntityList entities = tokeniser.getEntities();
-            GameAction action = tokeniser.getAction(entities);
+            CommandParser commandParser = new CommandParser(this, player, command);
+            EntityList entities = commandParser.getEntities();
+            GameAction action = commandParser.getAction(entities);
             return GameServer.joinStrings(action.performAction(player, entities), "\n");
         }
         catch (STAGException e) {
             return e.getMessage();
         }
         catch (Exception e) {
-            return "ERROR\n";
+            e.printStackTrace();
+            return "ERROR: " + e.getMessage();
         }
+    }
 
+    public Map<String, Location> getLocations() {
+        return locations;
+    }
+
+    public Location getStartLocation() { // used in testing only
+        return startLocation;
     }
 
     public static GameEntity getEntityFromLocations(String entityName,
@@ -70,17 +67,15 @@ public class GameState {
         for (Map.Entry<String, Location> location : locations.entrySet()) {
             entity = location.getValue().getEntity(entityName);
 
-            if (entity != null) return entity;
+            if (entity != null) {
+                return entity;
+            }
         }
         return null;
     }
 
     public Set<GameAction> getAction(String keyPhrase) {
-
-        if (actions.containsKey(keyPhrase)) {
-            return actions.get(keyPhrase);
-        }
-        return null;
+        return actions.get(keyPhrase);
     }
 
     public GamePlayers getPlayers() {
@@ -88,41 +83,35 @@ public class GameState {
     }
 
     public Map<String, Set<GameAction>> getActions() {
-        return actions;
+        return Map.copyOf(actions);
     }
 
     private Map<String, Set<GameAction>> getBasicActions() {
-
         Map<String, Set<GameAction>> actions = new HashMap<>();
-        Set<GameAction> inventoryAction = this.encapsulateActionInSet(new InventoryAction());
+        Set<GameAction> inventoryAction = Set.of(new InventoryAction());
+
         actions.put("inventory", inventoryAction);
         actions.put("inv", inventoryAction);
-        actions.put("get", this.encapsulateActionInSet(new GetAction()));
-        actions.put("drop", this.encapsulateActionInSet(new DropAction()));
-        actions.put("goto", this.encapsulateActionInSet(new GotoAction()));
-        actions.put("look", this.encapsulateActionInSet(new LookAction()));
-        actions.put("health", this.encapsulateActionInSet(new HealthAction()));
+        actions.put("get", Set.of(new GetAction()));
+        actions.put("drop", Set.of(new DropAction()));
+        actions.put("goto", Set.of(new GotoAction()));
+        actions.put("look", Set.of(new LookAction()));
+        actions.put("health", Set.of(new HealthAction()));
+
         return actions;
     }
 
-    private Set<GameAction> encapsulateActionInSet(GameAction action) {
-        Set<GameAction> actionSet = new HashSet<>();
-        actionSet.add(action);
-        return actionSet;
-    }
-
     private Map<String, Set<GameAction>> getCustomActions(File actionsFile) throws Exception {
-
         DocumentBuilder builder;
         Document document;
 
         try {
             builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             document = builder.parse(actionsFile);
-        }
-        catch (Exception | Error e) {
+        } catch (Exception | Error e) {
             throw new STAGException.ActionsFileParseException();
         }
+
         Element root = document.getDocumentElement();
         NodeList actionNodes = root.getChildNodes();
         int index = 1;
@@ -134,7 +123,7 @@ public class GameState {
             if (!Objects.equals(action.getTagName(), "action")) {
                 throw new STAGException.MalformedActionsFileException();
             }
-            Element triggers = (Element) action.getElementsByTagName("triggers").item(0);
+            Element triggers = (Element) action.getElementsByTagName("triggers").item(0); // todo something
             Set<String> keyPhrases = this.getKeyPhrases(triggers);
             CustomAction customAction = new CustomAction(locations, action);
 
@@ -150,13 +139,12 @@ public class GameState {
                     actions.put(keyPhraseLowerCase, actionSet);
                 }
             }
-            index+=2;
+            index += 2;
         }
         return actions;
     }
 
     private Set<String> getKeyPhrases(Element triggers) {
-
         int index = 0;
         Node node;
         Set<String> keyPhrases = new HashSet<>();
@@ -164,45 +152,48 @@ public class GameState {
         while ((node = triggers.getElementsByTagName("keyphrase").item(index++)) != null) {
             keyPhrases.add(node.getTextContent());
         }
+
         return keyPhrases;
     }
 
     private void getEntitiesFromFile(File entitiesFile) throws Exception {
-
         Parser parser = new Parser();
-        FileReader reader;
 
-        try {
-            reader = new FileReader(entitiesFile);
+        try (FileReader reader = new FileReader(entitiesFile)) {
             parser.parse(reader);
         }
         catch (Exception e) {
-            e.printStackTrace();
             throw new STAGException.EntitiesFileParseException();
         }
+
         Graph wholeDocument = parser.getGraphs().get(0);
         // get first sub-graph (start location)
-        Graph startLocation = wholeDocument.getSubgraphs().get(0).getSubgraphs().get(0);
-        this.startLocation = new Location(startLocation);
-        this.startLocation.initialiseAllEntityLocations();
-        locations.put(this.startLocation.getName(), this.startLocation);
-        wholeDocument.getSubgraphs().get(0).getSubgraphs().remove(0);
+        Graph startLocation = wholeDocument.getSubgraphs().get(0).getSubgraphs().remove(0);
+        this.startLocation = this.addLocation(startLocation);
 
         // get remaining locations
         for (Graph graph : wholeDocument.getSubgraphs().get(0).getSubgraphs()) {
-            Location location = new Location(graph);
-            location.initialiseAllEntityLocations(); // set all entity locations to current location
-            locations.put(location.getName(), location);
+            this.addLocation(graph);
         }
+
         // add storeroom to locations if it doesn't exist
         if (!locations.containsKey("storeroom")) {
             locations.put("storeroom", new Location("storeroom", null));
         }
+
         // get paths
         for (Edge edge : wholeDocument.getSubgraphs().get(1).getEdges()) {
             Location fromLocation = locations.get(edge.getSource().getNode().getId().getId());
             Location toLocation = locations.get(edge.getTarget().getNode().getId().getId());
             fromLocation.addEntity(toLocation);
         }
+    }
+
+    private Location addLocation(Graph locationGraph) throws Exception {
+        Location location = new Location(locationGraph);
+        location.initialiseAllEntityLocations();
+
+        locations.put(location.getName(), location);
+        return location;
     }
 }

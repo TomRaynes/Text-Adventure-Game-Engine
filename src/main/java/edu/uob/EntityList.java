@@ -1,6 +1,8 @@
 package edu.uob;
 
+import edu.uob.entity.Container;
 import edu.uob.entity.GameEntity;
+import edu.uob.entity.Inventory;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -23,6 +25,18 @@ public class EntityList implements Iterable<GameEntity> {
         for (EntityList entityList : entityLists) {
             this.addEntities(entityList);
         }
+    }
+
+    public boolean containsEntityInForeignInventory(Container inventory) {
+
+        for (GameEntity entity : entities) {
+            Container container = entity.getContainer();
+
+            if (container instanceof Inventory && !Objects.equals(inventory, container)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void addEntity(GameEntity entity) {

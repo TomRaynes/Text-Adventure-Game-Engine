@@ -7,7 +7,7 @@ import java.nio.file.Paths;
 
 public final class GameServer {
 
-    GameState state;
+    private GameState state;
     private static final String END_OF_TRANSMISSION = "\u0004";
 
     public static void main(String[] args) throws IOException {

@@ -40,6 +40,10 @@ digraph layout {
                 node [shape = "ellipse"];
                 elf [description = "Angry Elf"];
             }
+            subgraph artefacts {
+                node [shape = "ellipse"];
+                wand [description = "A magic wand"];
+            }
         }
 
         subgraph cluster004 {
@@ -61,6 +65,7 @@ digraph layout {
                 node [shape = "diamond"];
                 log [description = "A heavy wooden log"];
                 stick [description = "A stick"];
+                coin [description = "A gold coin"];
 
             }
             subgraph furniture {

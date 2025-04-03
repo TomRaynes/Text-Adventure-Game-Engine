@@ -10,14 +10,14 @@ import java.util.HashSet;
 public class Player implements Comparable<Player> {
 
     private final String name;
-    private Inventory inventory;
+    private final Inventory inventory;
     private Location location;
     private final Location startLocation;
     private int health;
 
     public Player(String name, Location startLocation) {
         this.name = name;
-        inventory = new Inventory("Inventory", null);
+        inventory = new Inventory(name, null);
         location = startLocation;
         this.startLocation = startLocation;
         health = 3;

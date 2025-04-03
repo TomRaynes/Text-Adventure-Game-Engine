@@ -7,7 +7,7 @@ import java.util.function.Consumer;
 
 public class GamePlayers implements Iterable<Player> {
 
-    private Map<String, Player> players;
+    private final Map<String, Player> players;
     private final Set<Character> legalChars;
     private final Location startLocation;
 
@@ -35,7 +35,7 @@ public class GamePlayers implements Iterable<Player> {
 
     private void checkNameIsInvalid(String name) throws Exception {
 
-        Set<Character> illegalChars = new HashSet<>();
+        Set<Character> illegalChars = new TreeSet<>();
 
         for (int index = 0; index < name.length(); index++) {
 

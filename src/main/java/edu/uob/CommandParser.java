@@ -1,24 +1,22 @@
 package edu.uob;
 
+import edu.uob.action.BasicAction;
 import edu.uob.action.CustomAction;
 import edu.uob.action.GameAction;
 import edu.uob.entity.GameEntity;
-import edu.uob.entity.Location;
 
 import java.util.*;
 
-public class Tokeniser {
+public class CommandParser {
 
-    String command;
-    GameState state;
-    Map<String, Location> locations;
-    Player player;
-    List<String> tokens;
+    private final String command;
+    private final GameState state;
+    private final Player player;
+    private final List<String> tokens;
 
-    public Tokeniser(GameState state, Map<String, Location> locations, Player player, String command) {
+    public CommandParser(GameState state, Player player, String command) {
         this.command = this.normaliseCommand(command);
         this.state = state;
-        this.locations = locations;
         this.player = player;
         tokens = new LinkedList<>();
         Scanner scanner = new Scanner(this.command);
@@ -35,7 +33,7 @@ public class Tokeniser {
         Set<GameEntity> entitySet = new HashSet<>();
 
         for (String entityName : tokens) {
-            GameEntity entity = GameState.getEntityFromLocations(entityName, locations);
+            GameEntity entity = GameState.getEntityFromLocations(entityName, state.getLocations());
 
             if (entity == null) { // entity may be artefact in player inventory
                 entity = player.getEntityFromInventory(entityName);
@@ -80,7 +78,26 @@ public class Tokeniser {
         if (actions.size() > 1) { // ambiguous command, multiple key phrases
             throw new STAGException.AmbiguousCommandException();
         }
-        return actions.iterator().next();
+        GameAction action = actions.iterator().next();
+
+        if (action instanceof BasicAction) {
+            this.checkActionOrdering();
+        }
+        return action;
+    }
+
+    private void checkActionOrdering() throws Exception {
+
+        String firstToken = tokens.get(0).toLowerCase();
+
+        for (String trigger : this.getBasicCommandTriggers()) {
+            if (firstToken.equals(trigger)) return;
+        }
+        throw new STAGException.IncorrectTokenOrderException();
+    }
+
+    private Set<String> getBasicCommandTriggers() {
+        return Set.of("look", "inv", "inventory", "get", "drop", "goto", "health");
     }
 
     private Set<GameAction> getMatchedActions(EntityList entities) throws Exception {
@@ -95,7 +112,7 @@ public class Tokeniser {
             GameAction action;
 
             // if action set size > 1, determine which is the relevant action from the subjects
-            if (actionSet.size() > 1) {
+            if (actionSet.size() > 1) { //TODO: do this after get priority actions
                 action = this.getActionFromEntities(actionSet, entities);
 
                 if (action == null) continue; // cant match an action with entities
@@ -161,21 +178,9 @@ public class Tokeniser {
 
     private String normaliseCommand(String command) {
 
-        command = this.replaceChars(command, "  ", " ");
-        command = this.replaceChars(command, ".", "");
-        command = this.replaceChars(command, ",", "");
-        command = this.replaceChars(command, ":", "");
-        command = this.replaceChars(command, ";", "");
-        command = this.replaceChars(command, "!", "");
-        command = this.replaceChars(command, "?", "");
-        return command.toLowerCase();
-    }
-
-    private String replaceChars(String command, String target, String replacement) {
-
-        while (command.contains(target)) {
-            command = command.replace(target, replacement);
+        while (command.contains("  ")) {
+            command = command.replace("  ", " ");
         }
-        return command;
+        return command.replaceAll("[.,:;!?]", "").toLowerCase();
     }
 }

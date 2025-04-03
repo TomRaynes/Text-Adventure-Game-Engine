@@ -77,6 +77,15 @@ public class STAGException extends Exception {
         }
     }
 
+    public static class ProducedEntityInForeignInventoryException extends STAGException {
+
+        @Serial private static final long serialVersionUID = 1;
+
+        public ProducedEntityInForeignInventoryException() {
+            super("An entity produced by this command is in another players inventory");
+        }
+    }
+
     public static class DuplicateEntityInCommandException extends STAGException {
 
         @Serial private static final long serialVersionUID = 1;
@@ -248,6 +257,15 @@ public class STAGException extends Exception {
             }
             return GameServer.joinStrings("The character ", illegalChars,
                     " is not allowed in player names");
+        }
+    }
+
+    public static class IncorrectTokenOrderException extends STAGException {
+
+        @Serial private static final long serialVersionUID = 1;
+
+        public IncorrectTokenOrderException() {
+            super("Incorrect order of tokens in command");
         }
     }
 }

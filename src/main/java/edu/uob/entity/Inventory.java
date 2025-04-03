@@ -7,12 +7,13 @@ import java.util.function.Consumer;
 
 public class Inventory extends Container implements Iterable<Artefact> {
 
-    private Map<String, Artefact> artefacts;
+    private final Map<String, Artefact> artefacts;
 
     public Inventory(String name, String description) {
         super(name, description);
         artefacts = new HashMap<>();
     }
+
     public Set<Artefact> getArtefactsSet() {
         return new HashSet<>(artefacts.values());
     }
@@ -21,12 +22,21 @@ public class Inventory extends Container implements Iterable<Artefact> {
         throw new STAGException.TryingToMoveContainerException(this);
     }
 
-    public void addEntity(Artefact artefact) {
-        artefacts.put(artefact.getName(), artefact);
+    public void addEntity(GameEntity entity) throws Exception {
+        if (entity instanceof Artefact artefact) {
+            artefacts.put(artefact.getName(), artefact);
+        } else {
+            throw new STAGException.IllegalMoveToInventoryException(entity);
+        }
     }
 
-    public void removeEntity(Artefact artefact) {
-        artefacts.remove(artefact.getName());
+    public void removeEntity(GameEntity entity) throws Exception {
+        if (entity instanceof Artefact) {
+            artefacts.remove(entity.getName());
+        }
+        else {
+            throw new STAGException.EntityNotInInventoryException(entity);
+        }
     }
 
     public GameEntity getEntity(String entityName) {
@@ -50,29 +60,5 @@ public class Inventory extends Container implements Iterable<Artefact> {
     @Override
     public void forEach(Consumer<? super Artefact> action) {
         artefacts.values().forEach(action);
-    }
-
-    public void addEntity(Character character) throws Exception {
-        throw new STAGException.IllegalMoveToInventoryException(character);
-    }
-
-    public void addEntity(Furniture furniture) throws Exception {
-        throw new STAGException.IllegalMoveToInventoryException(furniture);
-    }
-
-    public void addEntity(Location path) throws Exception {
-        throw new STAGException.IllegalMoveToInventoryException(path);
-    }
-
-    public void removeEntity(Character character) throws Exception {
-        throw new STAGException.EntityNotInInventoryException(character);
-    }
-
-    public void removeEntity(Furniture furniture) throws Exception {
-        throw new STAGException.EntityNotInInventoryException(furniture);
-    }
-
-    public void removeEntity(Location path) throws Exception {
-        throw new STAGException.EntityNotInInventoryException(path);
     }
 }

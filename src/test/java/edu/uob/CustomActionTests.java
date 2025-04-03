@@ -83,7 +83,7 @@ public class CustomActionTests {
         assertEquals(expected, response);
 
         // move table from storeroom
-        response = this.handleCommand("Roger", "build table with log");
+        response = this.handleCommand("Roger", "build with log");
         expected = "You build a table with the log\n";
         assertEquals(expected, response);
         response = this.handleCommand("Roger", "look");
@@ -255,6 +255,44 @@ public class CustomActionTests {
                    A dark forest
                    """;
         assertEquals(expected, response);
+
+        // produced artefact in another players inventory
+        this.handleCommand("Roger", "goto forest");
+        this.handleCommand("Roger", "get key");
+        this.handleCommand("Roger", "goto cabin");
+        this.handleCommand("Roger", "unlock with key");
+        this.handleCommand("Roger", "goto cellar");
+        response = this.handleCommand("Roger", "look");
+        expected = """
+                   You are in a dusty cellar. You can see:
+                   Angry Elf
+                   A magic wand
+                   A log cabin in the woods
+                   An empty room
+                   """;
+        assertEquals(expected, response);
+
+        response = this.handleCommand("Roger", "wave magic wand");
+        expected = "You wave the magic wand and produce a gold coin\n";
+        assertEquals(expected, response);
+        this.handleCommand("Roger", "get coin");
+        response = this.handleCommand("Roger", "wave magic wand");
+        expected = "You wave the magic wand and produce a gold coin\n";
+        assertEquals(expected, response);
+        this.handleCommand("Roger", "get coin");
+        // Roger now holds coin in inventory
+        this.handleCommand("David", "goto cellar");
+        response = this.handleCommand("David", "wave magic wand");
+        expected = "ERROR: An entity produced by this command is in another players inventory\n";
+        assertEquals(expected, response);
+        // check coin is still in Roger's inventory
+        response = this.handleCommand("Roger", "inv");
+        expected = """
+                   Your inventory contains:
+                   A razor sharp axe
+                   A gold coin
+                   """;
+        assertEquals(expected, response);
     }
 
     @Test
@@ -335,6 +373,21 @@ public class CustomActionTests {
                    A heavy wooden log
                    A log cabin in the woods
                    """;
+        assertEquals(expected, response);
+    }
+
+    @Test
+    void testTriggerContainsOtherTrigger() {
+        String response = this.handleCommand("Roger", "firstword forest");
+        String expected = "Action narration 1\n";
+        assertEquals(expected, response);
+
+        response = this.handleCommand("Roger", "firstword secondword forest");
+        expected = "Action narration 2\n";
+        assertEquals(expected, response);
+
+        response = this.handleCommand("Roger", "firstword secondword thirdword forthword fifthword forest");
+        expected = "Action narration 3\n";
         assertEquals(expected, response);
     }
 }

@@ -265,4 +265,61 @@
         <narration>You break the key with the axe</narration>
     </action>
 
+    <action>
+        <triggers>
+            <keyphrase>wave</keyphrase>
+        </triggers>
+        <subjects>
+            <entity>wand</entity>
+        </subjects>
+        <consumed>
+        </consumed>
+        <produced>
+            <entity>coin</entity>
+        </produced>
+        <narration>You wave the magic wand and produce a gold coin</narration>
+    </action>
+
+    <action>
+        <triggers>
+            <keyphrase>firstword</keyphrase>
+        </triggers>
+        <subjects>
+            <entity>forest</entity>
+        </subjects>
+        <consumed>
+        </consumed>
+        <produced>
+        </produced>
+        <narration>Action narration 1</narration>
+    </action>
+
+    <action>
+        <triggers>
+            <keyphrase>firstword secondword</keyphrase>
+        </triggers>
+        <subjects>
+            <entity>forest</entity>
+        </subjects>
+        <consumed>
+        </consumed>
+        <produced>
+        </produced>
+        <narration>Action narration 2</narration>
+    </action>
+
+    <action>
+        <triggers>
+            <keyphrase>firstword secondword thirdword forthword fifthword</keyphrase>
+        </triggers>
+        <subjects>
+            <entity>forest</entity>
+        </subjects>
+        <consumed>
+        </consumed>
+        <produced>
+        </produced>
+        <narration>Action narration 3</narration>
+    </action>
+
 </actions>
