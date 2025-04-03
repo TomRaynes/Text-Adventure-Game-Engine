@@ -5,7 +5,6 @@ import edu.uob.entity.GameEntity;
 import edu.uob.entity.Location;
 
 import java.io.Serial;
-import java.util.Set;
 
 public class STAGException extends Exception {
 
@@ -83,25 +82,6 @@ public class STAGException extends Exception {
 
         public ProducedEntityInForeignInventoryException() {
             super("An entity produced by this command is in another players inventory");
-        }
-    }
-
-    public static class DuplicateEntityInCommandException extends STAGException {
-
-        @Serial private static final long serialVersionUID = 1;
-
-        public DuplicateEntityInCommandException(GameEntity entity) {
-            super(GameServer.joinStrings(entity.getTitleCaseName(),
-                    " was referenced more than once in command"));
-        }
-    }
-
-    public static class DuplicateKeyPhraseInCommandException extends STAGException {
-
-        @Serial private static final long serialVersionUID = 1;
-
-        public DuplicateKeyPhraseInCommandException() {
-            super("Action trigger phrase was used more than once");
         }
     }
 

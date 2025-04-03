@@ -5,10 +5,8 @@ import edu.uob.entity.*;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 public class CustomAction extends GameAction {
 
@@ -19,7 +17,6 @@ public class CustomAction extends GameAction {
     private final EntityList produced;
     private final String narration;
     private int healthEffect;
-    private String keyPhrase;
 
     public CustomAction(Map<String, Location> locations, Element action) {
         this.locations = locations;
@@ -32,7 +29,6 @@ public class CustomAction extends GameAction {
     }
 
     public String performAction(Player player, EntityList entities) throws Exception {
-
         this.checkAvailabilityOfEntities(player);
         this.checkValidityOfEntities(entities);
         this.consumeEntities(player);
@@ -71,6 +67,16 @@ public class CustomAction extends GameAction {
         return locations.get("storeroom");
     }
 
+    public boolean isPerformable(Player player) {
+        try {
+            this.checkAvailabilityOfEntities(player);
+        }
+        catch (Exception e) {
+            return false;
+        }
+        return true;
+    }
+
     private void checkAvailabilityOfEntities(Player player) throws Exception {
 
         Location location = player.getLocation();
@@ -99,7 +105,6 @@ public class CustomAction extends GameAction {
         if (produced.containsEntityInForeignInventory(inventory)) {
             throw new STAGException.ProducedEntityInForeignInventoryException();
         }
-
     }
 
     private void checkValidityOfEntities(EntityList entities) throws Exception {

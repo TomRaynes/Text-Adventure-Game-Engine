@@ -297,7 +297,7 @@ public class CustomActionTests {
 
     @Test
     void testDuplicateTriggers() {
-        this.handleCommand("Roger", "goto forest");
+        //this.handleCommand("Roger", "goto forest");
         String response = this.handleCommand("Roger", "look");
         String expected = """
                           You are in a dark forest. You can see:
@@ -324,7 +324,7 @@ public class CustomActionTests {
 
         // ambiguous action
         response = this.handleCommand("Roger", "break");
-        expected = "ERROR: Command could not be matched to an action\n";
+        expected = "ERROR: Ambiguous command could be matched to multiple actions\n";
         assertEquals(expected, response);
         response = this.handleCommand("Roger", "look");
         expected = """
@@ -338,20 +338,6 @@ public class CustomActionTests {
 
         // duplicate key phrase in command
         response = this.handleCommand("Roger", "break break horn");
-        expected = "ERROR: Action trigger phrase was used more than once\n";
-        assertEquals(expected, response);
-        response = this.handleCommand("Roger", "look");
-        expected = """
-                   You are in a dark forest. You can see:
-                   An old brass horn
-                   Brass key
-                   A heavy wooden log
-                   A log cabin in the woods
-                   """;
-        assertEquals(expected, response);
-
-        // perform action on horn
-        response = this.handleCommand("Roger", "break horn with axe");
         expected = "You break the horn with the axe\n";
         assertEquals(expected, response);
         response = this.handleCommand("Roger", "look");
@@ -388,6 +374,54 @@ public class CustomActionTests {
 
         response = this.handleCommand("Roger", "firstword secondword thirdword forthword fifthword forest");
         expected = "Action narration 3\n";
+        assertEquals(expected, response);
+    }
+
+    @Test
+    void testFilterActions() {
+        // coin not available therefore unambiguous
+        this.handleCommand("Roger", "get key");
+        this.handleCommand("Roger", "goto cabin");
+        this.handleCommand("Roger", "unlock with key");
+        this.handleCommand("Roger", "goto cellar");
+        String response = this.handleCommand("Roger", "hit and pay elf");
+        String expected = "You attack the elf, but he fights back and you lose some health\n";
+        assertEquals(expected, response);
+
+        // coin is available therefore ambiguous
+        this.handleCommand("Roger", "wave magic wand");
+        response = this.handleCommand("Roger", "hit and pay elf");
+        expected = "ERROR: Ambiguous command could be matched to multiple actions\n";
+        assertEquals(expected, response);
+
+        // duplicate trigger
+        response = this.handleCommand("Roger", "look and look");
+        expected = """
+                   You are in a dusty cellar. You can see:
+                   A gold coin
+                   Angry Elf
+                   A magic wand
+                   A log cabin in the woods
+                   An empty room
+                   """;
+        assertEquals(expected, response);
+
+        // duplicate action
+        response = this.handleCommand("Roger", "inv inventory");
+        expected = """
+                   Your inventory contains:
+                   A razor sharp axe
+                   """;
+        assertEquals(expected, response);
+
+        // duplicate entity
+        response = this.handleCommand("Roger", "get coin coin");
+        expected = "Coin added to inventory\n";
+        assertEquals(expected, response);
+
+        // duplicate entity and trigger
+        response = this.handleCommand("Roger", "get wand and get wand");
+        expected = "Wand added to inventory\n";
         assertEquals(expected, response);
     }
 }

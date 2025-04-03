@@ -4,11 +4,8 @@ import edu.uob.EntityList;
 import edu.uob.GameServer;
 import edu.uob.Player;
 import edu.uob.STAGException;
-import edu.uob.entity.Artefact;
 import edu.uob.entity.Container;
 import edu.uob.entity.Inventory;
-
-import java.util.Map;
 
 public class InventoryAction extends BasicAction {
 

@@ -267,11 +267,11 @@ public class BasicActionsTests {
         this.handleCommand("Roger", "get axe");
         // duplicate entity
         response = this.handleCommand("Roger", "drop axe axe");
-        expected = "ERROR: Axe was referenced more than once in command\n";
+        expected = "Axe dropped from inventory\n";
         assertEquals(expected, response);
 
         response = this.handleCommand("Roger", "drop axe");
-        expected = "Axe dropped from inventory\n";
+        expected = "ERROR: Axe is not in your inventory\n";
         assertEquals(expected, response);
         response = this.handleCommand("Roger", "inv");
         expected = "Your inventory is empty\n";

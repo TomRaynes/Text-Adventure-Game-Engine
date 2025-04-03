@@ -9,7 +9,6 @@ import edu.uob.entity.Inventory;
 public class GetAction extends BasicAction {
 
     public String performAction(Player player, EntityList entities) throws Exception {
-
         GameEntity entity = BasicAction.getSingularEntity(entities, "GET");
         Inventory inventory = player.getInventory();
         entity.moveEntity(inventory, player.getLocation());

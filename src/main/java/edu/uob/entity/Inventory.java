@@ -14,10 +14,6 @@ public class Inventory extends Container implements Iterable<Artefact> {
         artefacts = new HashMap<>();
     }
 
-    public Set<Artefact> getArtefactsSet() {
-        return new HashSet<>(artefacts.values());
-    }
-
     public void moveEntity(Container toLocation, Container fromLocation) throws Exception {
         throw new STAGException.TryingToMoveContainerException(this);
     }

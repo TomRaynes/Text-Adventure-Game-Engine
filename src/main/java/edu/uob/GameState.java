@@ -40,15 +40,14 @@ public class GameState {
             String command = input.substring(index);
             CommandParser commandParser = new CommandParser(this, player, command);
             EntityList entities = commandParser.getEntities();
-            GameAction action = commandParser.getAction(entities);
+            GameAction action = commandParser.getAction(entities, player);
             return GameServer.joinStrings(action.performAction(player, entities), "\n");
         }
         catch (STAGException e) {
             return e.getMessage();
         }
         catch (Exception e) {
-            e.printStackTrace();
-            return "ERROR: " + e.getMessage();
+            return "ERROR\n";
         }
     }
 

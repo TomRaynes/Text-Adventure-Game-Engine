@@ -66,6 +66,7 @@ digraph layout {
                 log [description = "A heavy wooden log"];
                 stick [description = "A stick"];
                 coin [description = "A gold coin"];
+                shovel [description = "A sturdy shovel"];
 
             }
             subgraph furniture {

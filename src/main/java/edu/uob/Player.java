@@ -5,8 +5,6 @@ import edu.uob.entity.GameEntity;
 import edu.uob.entity.Inventory;
 import edu.uob.entity.Location;
 
-import java.util.HashSet;
-
 public class Player implements Comparable<Player> {
 
     private final String name;
@@ -46,7 +44,7 @@ public class Player implements Comparable<Player> {
 
     private String deathSequence() throws Exception {
 
-        for (Artefact artefact : inventory.getArtefactsSet()) {
+        for (Artefact artefact : inventory) {
             artefact.moveEntity(location, inventory);
         }
         location = startLocation;

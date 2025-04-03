@@ -69,6 +69,23 @@
 
     <action>
         <triggers>
+            <keyphrase>pay</keyphrase>
+        </triggers>
+        <subjects>
+            <entity>elf</entity>
+            <entity>coin</entity>
+        </subjects>
+        <consumed>
+            <entity>coin</entity>
+        </consumed>
+        <produced>
+            <entity>shovel</entity>
+        </produced>
+        <narration>You pay the elf your silver coin and he produces a shovel</narration>
+    </action>
+
+    <action>
+        <triggers>
             <keyphrase>drink</keyphrase>
         </triggers>
         <subjects>

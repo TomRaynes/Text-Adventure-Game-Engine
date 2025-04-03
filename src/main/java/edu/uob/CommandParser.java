@@ -9,17 +9,15 @@ import java.util.*;
 
 public class CommandParser {
 
-    private final String command;
     private final GameState state;
     private final Player player;
     private final List<String> tokens;
 
     public CommandParser(GameState state, Player player, String command) {
-        this.command = this.normaliseCommand(command);
         this.state = state;
         this.player = player;
-        tokens = new LinkedList<>();
-        Scanner scanner = new Scanner(this.command);
+        this.tokens = new LinkedList<>();
+        Scanner scanner = new Scanner(this.normaliseCommand(command));
         scanner.useDelimiter(" ");
 
         while (scanner.hasNext()) {
@@ -29,7 +27,6 @@ public class CommandParser {
     }
 
     public EntityList getEntities() throws Exception {
-
         Set<GameEntity> entitySet = new HashSet<>();
 
         for (String entityName : tokens) {
@@ -43,15 +40,12 @@ public class CommandParser {
             }
             if (entity == null) continue; // token is not an entity
 
-            if (!entitySet.add(entity)) { // entity is given more than once
-                throw new STAGException.DuplicateEntityInCommandException(entity);
-            }
+            entitySet.add(entity);
         }
         return new EntityList(entitySet);
     }
 
     private GameEntity getEntityFromAllInventories(String entityName) {
-
         GamePlayers players = state.getPlayers();
 
         for (Player player : players) {
@@ -64,19 +58,19 @@ public class CommandParser {
         return null;
     }
 
-    public GameAction getAction(EntityList entities) throws Exception {
+    public GameAction getAction(EntityList commandEntities, Player player) throws Exception {
+        Set<GameAction> actions = this.getMatchedActions();
 
-        Set<GameAction> actions = this.getMatchedActions(entities);
-
-        if (actions.isEmpty()) { // keyPhrase may contain multiple words
-            GameAction action = this.getMultiWordAction(entities);
-            if (action != null) actions.add(action);
-        }
         if (actions.isEmpty()) { // no action is specified
             throw new STAGException.NoActionFoundException();
         }
-        if (actions.size() > 1) { // ambiguous command, multiple key phrases
-            throw new STAGException.AmbiguousCommandException();
+        if (actions.size() > 1) {
+            actions = this.filterByEntities(actions, player); // match with available entities
+            actions = this.filterByEntities(actions, commandEntities); // match with specified entities
+
+            if (actions.size() != 1) { // ambiguous command, multiple key phrases
+                throw new STAGException.AmbiguousCommandException();
+            }
         }
         GameAction action = actions.iterator().next();
 
@@ -87,7 +81,6 @@ public class CommandParser {
     }
 
     private void checkActionOrdering() throws Exception {
-
         String firstToken = tokens.get(0).toLowerCase();
 
         for (String trigger : this.getBasicCommandTriggers()) {
@@ -100,27 +93,18 @@ public class CommandParser {
         return Set.of("look", "inv", "inventory", "get", "drop", "goto", "health");
     }
 
-    private Set<GameAction> getMatchedActions(EntityList entities) throws Exception {
+    private Set<GameAction> getMatchedActions() {
         // holds all actions that use any single-word key phrase present in command
         Set<GameAction> matchedActions = new HashSet<>();
 
         for (String keyPhrase : tokens) {
-            // hold all actions that use specific key phrase
+            // hold all actions that use trigger containing specific key phrase
             Set<GameAction> actionSet = this.getPriorityAction(keyPhrase, tokens.indexOf(keyPhrase));
-            if (actionSet == null) continue; // token is not key phrase
-            GameAction action;
 
-            // if action set size > 1, determine which is the relevant action from the subjects
-            if (actionSet.size() > 1) { //TODO: do this after get priority actions
-                action = this.getActionFromEntities(actionSet, entities);
-
-                if (action == null) continue; // cant match an action with entities
+            if (actionSet == null) {
+                continue; // token is not key phrase or component word of key phrase
             }
-            else action = actionSet.iterator().next();
-
-            if (!matchedActions.add(action)) { // key phrase is used more than once
-                throw new STAGException.DuplicateKeyPhraseInCommandException();
-            }
+            matchedActions.addAll(actionSet);
         }
         return matchedActions;
     }
@@ -128,11 +112,11 @@ public class CommandParser {
     private Set<GameAction> getPriorityAction(String trigger, int index) {
         Set<GameAction> triggerMatches = state.getAction(trigger);
 
-        if (index + 1 == tokens.size()) {
+        if (++index == tokens.size()) {
             return triggerMatches;
         }
-        String nextTrigger = GameServer.joinStrings(trigger, " ", tokens.get(index + 1));
-        Set<GameAction> nextTriggerMatches = this.getPriorityAction(nextTrigger, index+1);
+        String nextTrigger = GameServer.joinStrings(trigger, " ", tokens.get(index));
+        Set<GameAction> nextTriggerMatches = this.getPriorityAction(nextTrigger, index);
 
         if (nextTriggerMatches == null) {
             return triggerMatches;
@@ -140,54 +124,49 @@ public class CommandParser {
         return nextTriggerMatches;
     }
 
-    public GameAction getActionFromEntities(Set<GameAction> actions, EntityList entities)
+    private Set<GameAction> filterByEntities(Set<GameAction> actions, Player player)
+                                                                        throws Exception {
+        Set<GameAction> matchedActions = new HashSet<>();
+
+        for (GameAction action : actions) {
+            if (action instanceof CustomAction customAction) {
+                if (customAction.isPerformable(player)) {
+                    matchedActions.add(action);
+                }
+            }
+            else throw new STAGException.AmbiguousCommandException();
+        }
+        return matchedActions;
+    }
+
+    private Set<GameAction> filterByEntities(Set<GameAction> actions, EntityList entities)
                                                                             throws Exception {
-        Set<GameAction> matchedActions = null;
+        Set<GameAction> matchedActions = new HashSet<>();
         int currentMatches = 0;
 
         for (GameAction action : actions) {
-            EntityList subjects = ((CustomAction) action).getSubjects();
-            int matches = 0;
+            if (action instanceof CustomAction customAction) {
+                EntityList subjects = customAction.getSubjects();
+                int matches = 0;
 
-            for (GameEntity entity : entities) {
-                if (subjects.containsEntity(entity)) matches++;
-            }
-            if (matches > currentMatches) {
-                matchedActions = new HashSet<>();
-                matchedActions.add(action);
-                currentMatches = matches;
-            }
-            else if (matchedActions != null && matches == currentMatches) {
-                matchedActions.add(action);
-            }
-        }
-        if (matchedActions == null) {
-            return null;
-        }
-        if (matchedActions.size() > 1) {
-            throw new STAGException.AmbiguousCommandException();
-        }
-        return matchedActions.iterator().next();
-    }
-
-    private GameAction getMultiWordAction(EntityList entities) throws Exception {
-
-        GameAction action = null;
-
-        for (Map.Entry<String, Set<GameAction>> entry : state.getActions().entrySet()) {
-
-            if (command.contains(entry.getKey())) {
-                Set<GameAction> actionSet = entry.getValue();
-
-                if (actionSet.size() > 1) {
-                    action = this.getActionFromEntities(actionSet, entities);
+                for (GameEntity entity : entities) {
+                    if (subjects.containsEntity(entity)) {
+                        matches++;
+                    }
                 }
-                else {
-                    action = actionSet.iterator().next();
+
+                if (matches > currentMatches) {
+                    matchedActions = new HashSet<>();
+                    matchedActions.add(action);
+                    currentMatches = matches;
+                }
+                else if (matches == currentMatches) {
+                    matchedActions.add(action);
                 }
             }
+            else throw new STAGException.AmbiguousCommandException();
         }
-        return action;
+        return matchedActions;
     }
 
     private String normaliseCommand(String command) {

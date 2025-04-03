@@ -2,7 +2,6 @@ package edu.uob.entity;
 
 import com.alexmerz.graphviz.objects.Graph;
 import com.alexmerz.graphviz.objects.Node;
-import edu.uob.GameServer;
 import edu.uob.Player;
 import edu.uob.STAGException;
 

@@ -9,7 +9,7 @@ import java.util.function.Consumer;
 
 public class EntityList implements Iterable<GameEntity> {
 
-    private Set<GameEntity> entities;
+    private final Set<GameEntity> entities;
 
     public EntityList() {
         entities = new TreeSet<>();
@@ -25,6 +25,11 @@ public class EntityList implements Iterable<GameEntity> {
         for (EntityList entityList : entityLists) {
             this.addEntities(entityList);
         }
+    }
+
+    public <T extends GameEntity> EntityList(Map<String, T> entityMap) {
+        entities = new HashSet<>();
+        entities.addAll(entityMap.values());
     }
 
     public boolean containsEntityInForeignInventory(Container inventory) {
