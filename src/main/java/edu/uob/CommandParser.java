@@ -101,13 +101,12 @@ public class CommandParser {
     }
 
     private Set<GameAction> getMatchedActions(EntityList entities) throws Exception {
-
-        // holds all actions that use any key phrase present in command
+        // holds all actions that use any single-word key phrase present in command
         Set<GameAction> matchedActions = new HashSet<>();
 
         for (String keyPhrase : tokens) {
             // hold all actions that use specific key phrase
-            Set<GameAction> actionSet = state.getAction(keyPhrase);
+            Set<GameAction> actionSet = this.getPriorityAction(keyPhrase, tokens.indexOf(keyPhrase));
             if (actionSet == null) continue; // token is not key phrase
             GameAction action;
 
@@ -124,6 +123,21 @@ public class CommandParser {
             }
         }
         return matchedActions;
+    }
+
+    private Set<GameAction> getPriorityAction(String trigger, int index) {
+        Set<GameAction> triggerMatches = state.getAction(trigger);
+
+        if (index + 1 == tokens.size()) {
+            return triggerMatches;
+        }
+        String nextTrigger = GameServer.joinStrings(trigger, " ", tokens.get(index + 1));
+        Set<GameAction> nextTriggerMatches = this.getPriorityAction(nextTrigger, index+1);
+
+        if (nextTriggerMatches == null) {
+            return triggerMatches;
+        }
+        return nextTriggerMatches;
     }
 
     public GameAction getActionFromEntities(Set<GameAction> actions, EntityList entities)
